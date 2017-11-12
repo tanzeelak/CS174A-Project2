@@ -6,7 +6,7 @@
   window.onload = function init()        // ********************* THE ENTRY POINT OF THE WHOLE PROGRAM STARTS HERE *********************
     { window.contexts = {};                                                            // A global variable, "contexts".  Browsers support up to 16 WebGL contexts per page.
 
-      const scenes  = [ "Surfaces_Demo", "Movement_Controls", "Global_Info_Table" ]; // Register some scenes to the "Canvas_Manager" object -- which WebGL calls
+      const scenes  = ["Tutorial_Animation", "Movement_Controls", "Global_Info_Table" ]; // Register some scenes to the "Canvas_Manager" object -- which WebGL calls
                                                                                        // upon every time a draw / keyboard / mouse event happens.
 
       if( eval( "typeof " + scenes[0] ) !== "undefined" )
@@ -56,8 +56,15 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                      'strip'           : new Square(),                              // each with only one instance in the graphics card's memory.
                      'bad_tetrahedron' : new Tetrahedron( false ),                  // For example we would only create one "cube" blueprint in the GPU, but then
                      'tetrahedron'     : new Tetrahedron( true ),                   // re-use it many times per call to display to get multiple cubes in the scene.
-                     'windmill'        : new Windmill( 10 ) };
+                     'windmill'        : new Windmill( 10 ),
+                     'box'             : new Cube(),
+                     'sphere'          : new Subdivision_Sphere(4)
+                 };
       this.submit_shapes( context, shapes );
+      this.head_size = 2;
+      this.body_height = 3;
+      this.body_length = 2;
+      this.body_width = 1;
 
        // Place the camera, which is stored in a scratchpad for globals.  Secondly, setup the projection:  The matrix that determines how depth is treated.  It projects 3D points onto a plane.
       Object.assign( context.globals.graphics_state, { camera_transform: Mat4.translation([ 0, 0,-25 ]), projection_transform: Mat4.perspective( Math.PI/4, context.width/context.height, .1, 1000 ) } );
@@ -70,38 +77,69 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                              fire         : context.get_instance( Funny_Shader ).material(),
                              stars        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,1,1 ), .5, .5, .5, 40, context.get_instance( "assets/stars.png" ) ) } );
     }
+    draw_head (graphics_state, head_transform) {
+        head_transform = head_transform.times( Mat4.translation([ 0, 5, 0 ]) );
+        this.shapes.sphere.draw(graphics_state, head_transform.times(Mat4.scale(Vec.of(this.head_size,this.head_size,this.head_size))), this.greyPlastic);
+    }
+    draw_arms (graphics_state, arm_transform) {
+        var upper_arm_transform = arm_transform;
+        var orig = upper_arm_transform;
+        for (let i of [-1,1]) {
+        upper_arm_transform = upper_arm_transform.times(Mat4.translation([-this.body_length*i,this.body_height,0])); //transfer to hinge
+        upper_arm_transform = upper_arm_transform.times(Mat4.scale(Vec.of(.5,2,.5)));
+        upper_arm_transform = upper_arm_transform.times(Mat4.translation([-1*i,-1,0])); //moves by .5, 2
+        this.shapes.box.draw(graphics_state, upper_arm_transform, this.fire);
+        upper_arm_transform = orig;
+      }
+    }
+    draw_legs(graphics_state, leg_transform) {
+        var upper_leg_transform = leg_transform;
+        var orig = upper_leg_transform;
+        for (let i of [-1,1]) {
+            upper_leg_transform = upper_leg_transform.times(Mat4.translation([-this.body_length*i/2,-this.body_height,0])); //transfer to hinge
+            upper_leg_transform = upper_leg_transform.times(Mat4.scale(Vec.of(1,2,1)));
+            upper_leg_transform = upper_leg_transform.times(Mat4.translation([0,-1,0])); //moves by .5, 2
+            this.shapes.box.draw(graphics_state, upper_leg_transform, this.fire);
+            upper_leg_transform = orig;
+        }
+    }
   display( graphics_state )
     { var model_transform = Mat4.identity();             // We begin with a brand new model_transform every frame.
 
-      // *** Lights: *** Values of vector or point lights over time.  Two different lights *per shape* supported by Phong_Shader; more requires changing a number in the vertex
+    //   *** Lights: *** Values of vector or point lights over time.  Two different lights *per shape* supported by Phong_Shader; more requires changing a number in the vertex
       graphics_state.lights = [ new Light( Vec.of(  30,  30,  34, 1 ), Color.of( 0, .4, 0, 1 ), 100000 ),      // shader.  Arguments to construct a Light(): Light source position
                                 new Light( Vec.of( -10, -20, -14, 0 ), Color.of( 1, 1, .3, 1 ), 100    ) ];    // or vector (homogeneous coordinates), color, and size.
 
-      model_transform.post_multiply( Mat4.translation([ 0, 5, 0 ]) );
-      this.shapes.triangle       .draw( graphics_state, model_transform, this.stars );
+      var body_transform = model_transform;
+    //   body_transform.post_multiply( Mat4.translation([ 0, 0, 0 ]) );
+      this.shapes.box       .draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_length))), this.stars );
 
-      model_transform.post_multiply( Mat4.translation([ 0, -2, 0 ]) );
-      this.shapes.strip          .draw( graphics_state, model_transform, this.greyPlastic   );
+      this.draw_head(graphics_state, body_transform);
+      this.draw_arms(graphics_state, body_transform);
+      this.draw_legs(graphics_state, body_transform);
 
-      var t = graphics_state.animation_time/1000,   tilt_spin   = Mat4.rotation( 12*t, Vec.of(          .1,          .8,             .1 ) ),
-                                                    funny_orbit = Mat4.rotation(  2*t, Vec.of( Math.cos(t), Math.sin(t), .7*Math.cos(t) ) );
-
-      // Many shapes can share influence of the same pair of lights, but they don't have to.  All the following shapes will use these lights instead of the above ones.
-      graphics_state.lights = [ new Light( tilt_spin.times( Vec.of(  30,  30,  34, 1 ) ), Color.of( 0, .4, 0, 1 ), 100000               ),
-                                new Light( tilt_spin.times( Vec.of( -10, -20, -14, 0 ) ), Color.of( 1, 1, .3, 1 ), 100*Math.cos( t/10 ) ) ];
-
-      model_transform.post_multiply( Mat4.translation([ 0, -2, 0 ]) );
-      this.shapes.tetrahedron    .draw( graphics_state, model_transform.times( funny_orbit ), this.purplePlastic );
-
-      model_transform.post_multiply( Mat4.translation([ 0, -2, 0 ]) );
-      this.shapes.bad_tetrahedron.draw( graphics_state, model_transform.times( funny_orbit ), this.greyPlastic   );
-
-      model_transform.post_multiply( Mat4.translation([ 0, -2, 0 ]) );
-      this.shapes.windmill       .draw( graphics_state, model_transform.times( tilt_spin ),   this.purplePlastic );
-      model_transform.post_multiply( Mat4.translation([ 0, -2, 0 ]) );
-      this.shapes.windmill       .draw( graphics_state, model_transform,                      this.fire          );
-      model_transform.post_multiply( Mat4.translation([ 0, -2, 0 ]) );
-      this.shapes.windmill       .draw( graphics_state, model_transform,                      this.blueGlass     );
+    //   model_transform.post_multiply( Mat4.translation([ 0, -2, 0 ]) );
+    //   this.shapes.strip          .draw( graphics_state, model_transform, this.greyPlastic   );
+      //
+    //   var t = graphics_state.animation_time/1000,   tilt_spin   = Mat4.rotation( 12*t, Vec.of(          .1,          .8,             .1 ) ),
+    //                                                 funny_orbit = Mat4.rotation(  2*t, Vec.of( Math.cos(t), Math.sin(t), .7*Math.cos(t) ) );
+      //
+    //   // Many shapes can share influence of the same pair of lights, but they don't have to.  All the following shapes will use these lights instead of the above ones.
+    //   graphics_state.lights = [ new Light( tilt_spin.times( Vec.of(  30,  30,  34, 1 ) ), Color.of( 0, .4, 0, 1 ), 100000               ),
+    //                             new Light( tilt_spin.times( Vec.of( -10, -20, -14, 0 ) ), Color.of( 1, 1, .3, 1 ), 100*Math.cos( t/10 ) ) ];
+      //
+    //   model_transform.post_multiply( Mat4.translation([ 0, -2, 0 ]) );
+    //   this.shapes.tetrahedron    .draw( graphics_state, model_transform.times( funny_orbit ), this.purplePlastic );
+      //
+    //   model_transform.post_multiply( Mat4.translation([ 0, -2, 0 ]) );
+    //   this.shapes.bad_tetrahedron.draw( graphics_state, model_transform.times( funny_orbit ), this.greyPlastic   );
+      //
+    //   model_transform.post_multiply( Mat4.translation([ 0, -2, 0 ]) );
+    //   this.shapes.windmill       .draw( graphics_state, model_transform.times( tilt_spin ),   this.purplePlastic );
+    //   model_transform.post_multiply( Mat4.translation([ 0, -2, 0 ]) );
+    //   this.shapes.windmill       .draw( graphics_state, model_transform,                      this.fire          );
+    //   model_transform.post_multiply( Mat4.translation([ 0, -2, 0 ]) );
+    //   this.shapes.windmill       .draw( graphics_state, model_transform,                      this.blueGlass     );
     }
 }
 </script>
