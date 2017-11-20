@@ -91,6 +91,10 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
       this.arm_height = 2;
       this.arm_length = .5;
 
+      this.board_width = 4;
+      this.board_height = .5;
+      this.board_length = 1.5;
+
        // Place the camera, which is stored in a scratchpad for globals.  Secondly, setup the projection:  The matrix that determines how depth is treated.  It projects 3D points onto a plane.
       Object.assign( context.globals.graphics_state, { camera_transform: Mat4.translation([ 0, 0,-25 ]), projection_transform: Mat4.perspective( Math.PI/4, context.width/context.height, .1, 1000 ) } );
 
@@ -134,7 +138,18 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
       }
     }
     draw_skateboard(graphics_state, board_transform) {
+        board_transform = board_transform.times(Mat4.translation(Vec.of(this.leg_width,-5*this.leg_height/4,0)));
+        this.shapes.box.draw(graphics_state, board_transform.times(Mat4.scale(Vec.of(this.board_width,this.board_height,this.board_length))), this.fire);
 
+        let wheel_transform = board_transform;
+        var orig = wheel_transform;
+        for (let i of [-1, 1]){
+            for (let j of [-1, 1]) {
+                wheel_transform = wheel_transform.times(Mat4.translation([this.board_width*j, -1.5, this.board_width/2*i]));
+                this.shapes.sphere.draw(graphics_state, wheel_transform, this.blueGlass);
+                wheel_transform = orig;
+            }
+        }
     }
     draw_legs(graphics_state, leg_transform) {
         let hinge_width = 0;
@@ -150,7 +165,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
             //hinge location
             upper_leg_transform = upper_leg_transform.times(Mat4.translation(Vec.of(hinge_width, hinge_height, hinge_length)));
-            upper_leg_transform = upper_leg_transform.times(Mat4.rotation(-1 + Math.PI/8*(Math.sin(this.globals.graphics_state.animation_time/100+i)), Vec.of(1,0,0)));
+            upper_leg_transform = upper_leg_transform.times(Mat4.rotation(-1 + Math.PI/8*(Math.sin(this.globals.graphics_state.animation_time/100)), Vec.of(1,0,0)));
             upper_leg_transform = upper_leg_transform.times(Mat4.translation(Vec.of(-hinge_width, -hinge_height, -hinge_length)));
 
             //scale
@@ -162,26 +177,30 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
             //hinge
             bottom_leg_transform = bottom_leg_transform.times(Mat4.translation(Vec.of(hinge_width, hinge_height, -hinge_length)));
-            bottom_leg_transform = bottom_leg_transform.times(Mat4.rotation(-(-1 + Math.PI/8*(Math.sin(this.globals.graphics_state.animation_time/100+i))), Vec.of(1,0,0)));
+            bottom_leg_transform = bottom_leg_transform.times(Mat4.rotation(-(-1 + Math.PI/8*(Math.sin(this.globals.graphics_state.animation_time/100))), Vec.of(1,0,0)));
             bottom_leg_transform = bottom_leg_transform.times(Mat4.translation(Vec.of(-hinge_width, -(hinge_height), hinge_length)));
 
             //scale
-            // bottom_leg_transform = bottom_leg_transform.times(Mat4.scale(Vec.of(this.leg_width,this.leg_height,this.leg_length)));
             this.shapes.box.draw(graphics_state, bottom_leg_transform.times(Mat4.scale(Vec.of(this.leg_width,this.leg_height,this.leg_length))), this.purplePlastic);
+
+            if (i == 1) {
+                this.draw_skateboard(graphics_state, bottom_leg_transform);
+            }
 
             upper_leg_transform = orig;
         }
-        // let bottom_leg_transform = upper_leg_transform;
-        // console.log("bottom leg" + bottom_leg_transform);
-        // // this.shapes.box.draw(graphics_state, upper_leg_transform, this.fire);
-        // bottom_leg_transform = bottom_leg_transform.times(Mat4.scale(Vec.of(2,2,2)));
-        // this.shapes.sphere.draw(graphics_state, bottom_leg_transform, this.purplePlastic);
-
-
-        // draw_skateboard(graphics_state, upper_leg_transform);
     }
+scene1(graphics_state, body_transform) {
+    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
+    this.draw_head(graphics_state, body_transform);
+    this.draw_arms(graphics_state, body_transform);
+    this.draw_legs(graphics_state, body_transform);
+}
   display( graphics_state )
-    { var model_transform = Mat4.identity();             // We begin with a brand new model_transform every frame.
+    {
+        var storedTime = this.globals.graphics_state.animation_time;
+
+        var model_transform = Mat4.identity();             // We begin with a brand new model_transform every frame.
 
     //   *** Lights: *** Values of vector or point lights over time.  Two different lights *per shape* supported by Phong_Shader; more requires changing a number in the vertex
       graphics_state.lights = [ new Light( Vec.of(  30,  30,  34, 1 ), Color.of( 0, .4, 0, 1 ), 100000 ),      // shader.  Arguments to construct a Light(): Light source position
@@ -189,12 +208,13 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
       var body_transform = model_transform;
     //   body_transform.post_multiply( Mat4.translation([ 0, 0, 0 ]) );
-      this.shapes.box       .draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
 
 
-      this.draw_head(graphics_state, body_transform);
-      this.draw_arms(graphics_state, body_transform);
-      this.draw_legs(graphics_state, body_transform);
+    //   if (this.globals.graphics_state.animation_time/1000 > 4 && this.globals.graphics_state.animation_time/1000 < 10) {
+          this.scene1(graphics_state, body_transform);
+    //   }
+
+
 
     //   model_transform.post_multiply( Mat4.translation([ 0, -2, 0 ]) );
     //   this.shapes.strip          .draw( graphics_state, model_transform, this.greyPlastic   );
