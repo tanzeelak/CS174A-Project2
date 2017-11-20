@@ -61,10 +61,35 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                      'sphere'          : new Subdivision_Sphere(4)
                  };
       this.submit_shapes( context, shapes );
+
+      let sin_rows_func       =      i  => { return Vec.of( .5 + Math.sin(777*i)/4, 2-4*i, 0 ) },                                   // Different callbacks for telling Grid_Patch
+          sin_columns_func    = ( j,p ) => { return Mat4.translation([ Math.sin(777*j)/4,0,4/30    ]).times( p.to4(1) ).to3() },    // how it chould advance to the next row/column.
+          rotate_columns_func = ( j,p ) => { return Mat4.rotation( .1*j*Math.PI, Vec.of( 0,1,0 )    ).times( p.to4(1) ).to3() },
+          sample_square_func  =      i  => { return Grid_Patch.sample_array( square_array, i ) },
+          sample_star_func    =      i  => { return Grid_Patch.sample_array( star_array,   i ) },
+          sample_circle_func  =      i  => { return Grid_Patch.sample_array( circle_array, i ) },
+          sample_two_arrays   = (j,p,i) => { return Mat4.translation([0,0,2*j]).times( sample_star_func(i).mix( sample_circle_func(i), j ).to4(1) ).to3() },
+          sample_two_arrays2  = (j,p,i) => { return Mat4.rotation( .5*j*Math.PI, Vec.of( 1,1,1 ) ).times(
+                                                    Mat4.translation([0,0,2*j]).times( sample_star_func(i).mix( sample_square_func(i), j ).to4(1) ) ).to3() },
+          line_rows_func      = ( i,p ) => { return p ? Mat4.translation([0,i/50,0]).times( p.to4(1) ).to3() :  Vec.of( .01,-.05,-.1 ) },
+          transform_cols_func = (j,p,i) => { return Mat4.rotation( Math.PI/8, Vec.of( 0,0,1 ) ).times( Mat4.scale([ 1.1,1.1,1.1 ])).times( Mat4.translation([ 0,0,.005 ]))
+                                                      .times( p.to4(1) ).to3() };
+
+
+
       this.head_size = 2;
+
       this.body_height = 3;
       this.body_length = 2;
       this.body_width = 1;
+
+      this.leg_width = 1;
+      this.leg_height = 2;
+      this.leg_length = 1;
+
+      this.arm_width = .5;
+      this.arm_height = 2;
+      this.arm_length = .5;
 
        // Place the camera, which is stored in a scratchpad for globals.  Secondly, setup the projection:  The matrix that determines how depth is treated.  It projects 3D points onto a plane.
       Object.assign( context.globals.graphics_state, { camera_transform: Mat4.translation([ 0, 0,-25 ]), projection_transform: Mat4.perspective( Math.PI/4, context.width/context.height, .1, 1000 ) } );
@@ -82,26 +107,78 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
         this.shapes.sphere.draw(graphics_state, head_transform.times(Mat4.scale(Vec.of(this.head_size,this.head_size,this.head_size))), this.greyPlastic);
     }
     draw_arms (graphics_state, arm_transform) {
+        let hinge_width = this.arm_width;
+        let hinge_height = this.arm_height;
+        let hinge_length = 0;
+
+
         var upper_arm_transform = arm_transform;
         var orig = upper_arm_transform;
         for (let i of [-1,1]) {
-        upper_arm_transform = upper_arm_transform.times(Mat4.translation([-this.body_length*i,this.body_height,0])); //transfer to hinge
-        upper_arm_transform = upper_arm_transform.times(Mat4.scale(Vec.of(.5,2,.5)));
-        upper_arm_transform = upper_arm_transform.times(Mat4.translation([-1*i,-1,0])); //moves by .5, 2
-        this.shapes.box.draw(graphics_state, upper_arm_transform, this.fire);
-        upper_arm_transform = orig;
+            //correct location
+            upper_arm_transform = upper_arm_transform.times(Mat4.translation([-1.25*this.body_length*i,this.body_height/3,0])); //transfer to hinge
+
+
+            //hinge location
+            upper_arm_transform = upper_arm_transform.times(Mat4.translation(Vec.of(hinge_width*i, hinge_height, hinge_length)));
+            upper_arm_transform = upper_arm_transform.times(Mat4.rotation(-1 + Math.PI/12*(Math.sin(this.globals.graphics_state.animation_time/100)), Vec.of(0,0,1*i)));
+
+            upper_arm_transform = upper_arm_transform.times(Mat4.translation(Vec.of(-hinge_width*i, -hinge_height, -hinge_length)));
+
+            //scaling
+            upper_arm_transform = upper_arm_transform.times(Mat4.scale(Vec.of(this.arm_width,this.arm_height,this.arm_length)));
+            // upper_arm_transform = upper_arm_transform.times(Mat4.translation([-1*i,-1,0])); //moves by .5, 2
+
+            this.shapes.box.draw(graphics_state, upper_arm_transform, this.fire);
+            upper_arm_transform = orig;
       }
     }
+    draw_skateboard(graphics_state, board_transform) {
+
+    }
     draw_legs(graphics_state, leg_transform) {
+        let hinge_width = 0;
+        let hinge_height = this.leg_height;
+        let hinge_length = 3*this.leg_length/4;
+
+
         var upper_leg_transform = leg_transform;
         var orig = upper_leg_transform;
         for (let i of [-1,1]) {
-            upper_leg_transform = upper_leg_transform.times(Mat4.translation([-this.body_length*i/2,-this.body_height,0])); //transfer to hinge
-            upper_leg_transform = upper_leg_transform.times(Mat4.scale(Vec.of(1,2,1)));
-            upper_leg_transform = upper_leg_transform.times(Mat4.translation([0,-1,0])); //moves by .5, 2
-            this.shapes.box.draw(graphics_state, upper_leg_transform, this.fire);
+            //correct location
+            upper_leg_transform = upper_leg_transform.times(Mat4.translation([-this.body_length*i/2,-this.body_height-2,0])); //transfer to hinge
+
+            //hinge location
+            upper_leg_transform = upper_leg_transform.times(Mat4.translation(Vec.of(hinge_width, hinge_height, hinge_length)));
+            upper_leg_transform = upper_leg_transform.times(Mat4.rotation(-1 + Math.PI/8*(Math.sin(this.globals.graphics_state.animation_time/100+i)), Vec.of(1,0,0)));
+            upper_leg_transform = upper_leg_transform.times(Mat4.translation(Vec.of(-hinge_width, -hinge_height, -hinge_length)));
+
+            //scale
+            this.shapes.box.draw(graphics_state, upper_leg_transform.times(Mat4.scale(Vec.of(this.leg_width,this.leg_height,this.leg_length))), this.fire);
+
+            let bottom_leg_transform = upper_leg_transform;
+            //correct position
+            bottom_leg_transform = bottom_leg_transform.times(Mat4.translation(Vec.of(0,-2*this.leg_height,0)));
+
+            //hinge
+            bottom_leg_transform = bottom_leg_transform.times(Mat4.translation(Vec.of(hinge_width, hinge_height, -hinge_length)));
+            bottom_leg_transform = bottom_leg_transform.times(Mat4.rotation(-(-1 + Math.PI/8*(Math.sin(this.globals.graphics_state.animation_time/100+i))), Vec.of(1,0,0)));
+            bottom_leg_transform = bottom_leg_transform.times(Mat4.translation(Vec.of(-hinge_width, -(hinge_height), hinge_length)));
+
+            //scale
+            // bottom_leg_transform = bottom_leg_transform.times(Mat4.scale(Vec.of(this.leg_width,this.leg_height,this.leg_length)));
+            this.shapes.box.draw(graphics_state, bottom_leg_transform.times(Mat4.scale(Vec.of(this.leg_width,this.leg_height,this.leg_length))), this.purplePlastic);
+
             upper_leg_transform = orig;
         }
+        // let bottom_leg_transform = upper_leg_transform;
+        // console.log("bottom leg" + bottom_leg_transform);
+        // // this.shapes.box.draw(graphics_state, upper_leg_transform, this.fire);
+        // bottom_leg_transform = bottom_leg_transform.times(Mat4.scale(Vec.of(2,2,2)));
+        // this.shapes.sphere.draw(graphics_state, bottom_leg_transform, this.purplePlastic);
+
+
+        // draw_skateboard(graphics_state, upper_leg_transform);
     }
   display( graphics_state )
     { var model_transform = Mat4.identity();             // We begin with a brand new model_transform every frame.
@@ -112,7 +189,8 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
       var body_transform = model_transform;
     //   body_transform.post_multiply( Mat4.translation([ 0, 0, 0 ]) );
-      this.shapes.box       .draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_length))), this.stars );
+      this.shapes.box       .draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
+
 
       this.draw_head(graphics_state, body_transform);
       this.draw_arms(graphics_state, body_transform);
