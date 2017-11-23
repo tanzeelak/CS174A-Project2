@@ -95,6 +95,13 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
       this.board_height = .5;
       this.board_length = 1.5;
 
+      this.shoe_width = 1;
+      this.shoe_height = .75;
+      this.shoe_length = 2;
+
+      this.cliff_width = 40;
+      this.cliff_height = 50
+      this.cliff_length = 40;
        // Place the camera, which is stored in a scratchpad for globals.  Secondly, setup the projection:  The matrix that determines how depth is treated.  It projects 3D points onto a plane.
       Object.assign( context.globals.graphics_state, { camera_transform: Mat4.translation([ 0, 0,-25 ]), projection_transform: Mat4.perspective( Math.PI/4, context.width/context.height, .1, 1000 ) } );
 
@@ -103,6 +110,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
       Object.assign( this, { purplePlastic: context.get_instance( Phong_Model  ).material( Color.of( .9,.5,.9, 1 ), .4, .4, .8, 40 ),
                              greyPlastic  : context.get_instance( Phong_Model  ).material( Color.of( .5,.5,.5, 1 ), .4, .8, .4, 20 ),   // Smaller exponent means
                              blueGlass    : context.get_instance( Phong_Model  ).material( Color.of( .5,.5, 1,.2 ), .4, .8, .4, 40 ),   // a bigger shiny spot.
+                             greenGrass    : context.get_instance( Phong_Model  ).material( Color.of( .5,1,.5,.2 ), .4, .8, .4, 40 ),   // a bigger shiny spot.
                              fire         : context.get_instance( Funny_Shader ).material(),
                              stars        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,1,1 ), .5, .5, .5, 40, context.get_instance( "assets/stars.png" ) ) } );
     }
@@ -138,14 +146,16 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
       }
     }
     draw_skateboard(graphics_state, board_transform) {
-        board_transform = board_transform.times(Mat4.translation(Vec.of(this.leg_width,-5*this.leg_height/4,0)));
+        // board_transform = board_transform.times(Mat4.translation(Vec.of(this.leg_width,-5*this.leg_height/4,0)));
+
+        board_transform = board_transform.times(Mat4.translation(Vec.of(0, -this.body_height - 4.5*this.leg_height - 1.75*this.shoe_height, 2*this.body_length)));
         this.shapes.box.draw(graphics_state, board_transform.times(Mat4.scale(Vec.of(this.board_width,this.board_height,this.board_length))), this.fire);
 
         let wheel_transform = board_transform;
         var orig = wheel_transform;
         for (let i of [-1, 1]){
             for (let j of [-1, 1]) {
-                wheel_transform = wheel_transform.times(Mat4.translation([this.board_width*j, -1.5, this.board_width/2*i]));
+                wheel_transform = wheel_transform.times(Mat4.translation([this.board_width*j, -2*this.shoe_height, this.board_length*i]));
                 this.shapes.sphere.draw(graphics_state, wheel_transform, this.blueGlass);
                 wheel_transform = orig;
             }
@@ -154,48 +164,66 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
     draw_legs(graphics_state, leg_transform) {
         let hinge_width = 0;
         let hinge_height = this.leg_height;
-        let hinge_length = 3*this.leg_length/4;
+        let hinge_length = this.leg_length;
 
 
         var upper_leg_transform = leg_transform;
         var orig = upper_leg_transform;
         for (let i of [-1,1]) {
             //correct location
-            upper_leg_transform = upper_leg_transform.times(Mat4.translation([-this.body_length*i/2,-this.body_height-2,0])); //transfer to hinge
-
+            upper_leg_transform = upper_leg_transform.times(Mat4.translation([-this.body_length/2*i,-this.body_height-this.leg_height,0])); //transfer to hinge
             //hinge location
             upper_leg_transform = upper_leg_transform.times(Mat4.translation(Vec.of(hinge_width, hinge_height, hinge_length)));
-            upper_leg_transform = upper_leg_transform.times(Mat4.rotation(-1 + Math.PI/8*(Math.sin(this.globals.graphics_state.animation_time/100)), Vec.of(1,0,0)));
+            // this.shapes.sphere.draw(graphics_state, upper_leg_transform, this.fire);
+            upper_leg_transform = upper_leg_transform.times(Mat4.rotation(-1 + Math.PI/24*(Math.sin(this.globals.graphics_state.animation_time/100)), Vec.of(1,0,0)));
             upper_leg_transform = upper_leg_transform.times(Mat4.translation(Vec.of(-hinge_width, -hinge_height, -hinge_length)));
-
             //scale
             this.shapes.box.draw(graphics_state, upper_leg_transform.times(Mat4.scale(Vec.of(this.leg_width,this.leg_height,this.leg_length))), this.fire);
 
             let bottom_leg_transform = upper_leg_transform;
             //correct position
             bottom_leg_transform = bottom_leg_transform.times(Mat4.translation(Vec.of(0,-2*this.leg_height,0)));
-
             //hinge
             bottom_leg_transform = bottom_leg_transform.times(Mat4.translation(Vec.of(hinge_width, hinge_height, -hinge_length)));
-            bottom_leg_transform = bottom_leg_transform.times(Mat4.rotation(-(-1 + Math.PI/8*(Math.sin(this.globals.graphics_state.animation_time/100))), Vec.of(1,0,0)));
+            bottom_leg_transform = bottom_leg_transform.times(Mat4.rotation(-(-1 + Math.PI/24*(Math.sin(this.globals.graphics_state.animation_time/100))), Vec.of(1,0,0)));
             bottom_leg_transform = bottom_leg_transform.times(Mat4.translation(Vec.of(-hinge_width, -(hinge_height), hinge_length)));
-
             //scale
-            this.shapes.box.draw(graphics_state, bottom_leg_transform.times(Mat4.scale(Vec.of(this.leg_width,this.leg_height,this.leg_length))), this.purplePlastic);
+            this.shapes.box.draw(graphics_state, bottom_leg_transform.times(Mat4.scale(Vec.of(this.leg_width,this.leg_height,this.leg_length))), this.fire);
 
-            if (i == 1) {
-                this.draw_skateboard(graphics_state, bottom_leg_transform);
-            }
+            let foot_transform = bottom_leg_transform;
+            foot_transform = foot_transform.times(Mat4.translation(Vec.of(0,-this.leg_height-1, 0)));
+            this.shapes.sphere.draw(graphics_state, foot_transform, this.fire);
 
+            let shoe_transform = orig;
+            shoe_transform = shoe_transform.times(Mat4.translation(Vec.of(i, -this.body_height - 4.5*this.leg_height, 2*this.body_length)));
+            this.shapes.box.draw(graphics_state, shoe_transform.times(Mat4.scale(Vec.of(this.shoe_width,this.shoe_height,this.shoe_length))), this.stars);
+            // if (i == 1) {
+            //     this.draw_skateboard(graphics_state, bottom_leg_transform);
+            // }
             upper_leg_transform = orig;
         }
     }
+    draw_cliff(graphics_state, cliff_transform) {
+        cliff_transform = cliff_transform.times(Mat4.translation(Vec.of(0, -this.body_height - 4.5*this.leg_height - 2*this.shoe_height -2.5 - this.cliff_height, 2*this.body_length)));
+        this.shapes.box.draw(graphics_state, cliff_transform.times(Mat4.scale(Vec.of(this.cliff_width, this.cliff_height, this.cliff_length))), this.greenGrass);
+    }
 scene1(graphics_state, body_transform) {
+    //camera, looking at, up
+    // graphics_state.camera_transform = Mat4.look_at( Vec.of( -20,0, 80), Vec.of( 0,0,0 ), Vec.of( 0,1,0 ) );
+    var cliff_transform = Mat4.identity();
+    this.draw_cliff(graphics_state, cliff_transform);
+
+    body_transform = body_transform.times(Mat4.translation([this.globals.graphics_state.animation_time/500, 0, 0]));
     this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
     this.draw_head(graphics_state, body_transform);
     this.draw_arms(graphics_state, body_transform);
     this.draw_legs(graphics_state, body_transform);
-}
+
+    var board_transform = Mat4.identity();
+    board_transform = board_transform.times(Mat4.translation([this.globals.graphics_state.animation_time/500, 0, 0]));
+    this.draw_skateboard(graphics_state, board_transform);
+    }
+
   display( graphics_state )
     {
         var storedTime = this.globals.graphics_state.animation_time;
@@ -207,13 +235,14 @@ scene1(graphics_state, body_transform) {
                                 new Light( Vec.of( -10, -20, -14, 0 ), Color.of( 1, 1, .3, 1 ), 100    ) ];    // or vector (homogeneous coordinates), color, and size.
 
       var body_transform = model_transform;
-    //   body_transform.post_multiply( Mat4.translation([ 0, 0, 0 ]) );
 
-
-    //   if (this.globals.graphics_state.animation_time/1000 > 4 && this.globals.graphics_state.animation_time/1000 < 10) {
+      if (this.globals.graphics_state.animation_time/1000 > 0 && this.globals.graphics_state.animation_time/1000 < 4) {
           this.scene1(graphics_state, body_transform);
-    //   }
-
+      }
+      else if (this.globals.graphics_state.animation_time/1000 > 4 && this.globals.graphics_state.animation_time/1000 < 10) {
+          console.log("scen2")
+          this.scene1(graphics_state, body_transform);
+      }
 
 
     //   model_transform.post_multiply( Mat4.translation([ 0, -2, 0 ]) );
