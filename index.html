@@ -58,7 +58,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
         'tetrahedron'     : new Tetrahedron( true ),                   // re-use it many times per call to display to get multiple cubes in the scene.
         'windmill'        : new Windmill( 10 ),
         'box'             : new Cube(),
-        'sphere'          : new Subdivision_Sphere(4)
+        'ball'          : new Subdivision_Sphere(4)
     };
     this.submit_shapes( context, shapes );
 
@@ -121,12 +121,176 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 greyPlastic  : context.get_instance( Phong_Model  ).material( Color.of( .5,.5,.5, 1 ), .4, .8, .4, 20 ),   // Smaller exponent means
                 blueGlass    : context.get_instance( Phong_Model  ).material( Color.of( .5,.5, 1,.2 ), .4, .8, .4, 40 ),   // a bigger shiny spot.
                 greenGrass    : context.get_instance( Phong_Model  ).material( Color.of( .5,1,.5,.2 ), .4, .8, .4, 40 ),   // a bigger shiny spot.
+                yellow: context.get_instance( Phong_Model ).material( Color.of( .8, .8, .3,  1 ), .2, 1, .7, 40 ),  // Call material() on the Phong_Shader,
+                brown:  context.get_instance( Phong_Model ).material( Color.of( .3, .3, .1,  1 ), .2, 1,  1, 40 ),  // which returns a special-made "material"
+                red:    context.get_instance( Phong_Model ).material( Color.of(  1,  0,  0, .9 ), .1, .7, 1, 40 ),  // (a JavaScript object)
+                green:  context.get_instance( Phong_Model ).material( Color.of(  0, .5,  0,  1 ), .1, .7, 1, 40 ),
+                blue:   context.get_instance( Phong_Model ).material( Color.of(  0,  0,  1, .8 ), .1, .7, 1, 40 ),
+                silver: context.get_instance( Phong_Model ).material( Color.of( .8, .8, .8,  1 ),  0,  1, 1, 40 ),
                 fire         : context.get_instance( Funny_Shader ).material(),
                 stars        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,1,1 ), .5, .5, .5, 40, context.get_instance( "assets/stars.png" ) ) } );
             }
+
+
+            ////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////// BUTTERFLY CODE //////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////
+
+
+            draw_arm( graphics_state, model_transform )
+            { const arm = model_transform.times( Mat4.translation([ 0,0,3+1 ]) );
+                this.shapes.ball.draw( graphics_state, arm, this.blue );
+            }
+            draw_butterfly_head( graphics_state, model_transform )
+            { let head = model_transform.times( Mat4.translation([ 0,0,this.body_length+this.head_all ]) );
+                head = head.times(Mat4.scale(Vec.of(this.head_all,this.head_all,this.head_all)));
+                this.shapes.ball.draw( graphics_state, head, this.red );
+            }
+            draw_abdomen( graphics_state, model_transform )
+            { const thorax = model_transform.times( Mat4.translation([ 0,0,3 ]) );
+                this.shapes.ball.draw( graphics_state, thorax, this.yellow );
+            }
+            draw_wing( graphics_state, wing_transform)
+            {
+                let wing_width = 2*Math.sqrt(2);
+                let wing_height = .2;
+                let wing_length = 2*Math.sqrt(2);
+                let hinge_width = -wing_width-1.2;
+                let hinge_height = -wing_height;
+                let hinge_length = 0;
+
+                //FLAPPING
+                wing_transform = wing_transform.times(Mat4.translation(Vec.of(hinge_width, hinge_height, hinge_length)));
+                wing_transform = wing_transform.times(Mat4.rotation(Math.sin(this.t*8)+.5, Vec.of(0,0,1)));
+                wing_transform = wing_transform.times(Mat4.translation(Vec.of(-hinge_width, -hinge_height, -hinge_length)));
+
+                //ROTATE TO DIAMOND
+                wing_transform = wing_transform.times(Mat4.rotation(Math.PI/4, Vec.of(0,1,0)));
+
+                //SCALE
+                wing_transform = wing_transform.times(Mat4.scale(Vec.of(wing_width, wing_height, wing_length)));
+                this.shapes.wing.draw( graphics_state, wing_transform, this.blue );
+            }
+            draw_leg(graphics_state, leg_transform){
+                let leg_width = this.body_width/4;
+                let leg_height = this.body_height;
+                let leg_length = this.body_length/16;
+                let hinge_width = -leg_height/4;
+                let hinge_height = leg_height;
+                let hinge_length = 0;
+
+                //TOP LEGS
+                // FLAPPING
+                leg_transform = leg_transform.times(Mat4.translation(Vec.of(hinge_width, hinge_height, hinge_length)));
+                leg_transform = leg_transform.times(Mat4.rotation(-1 + Math.PI/4*(Math.sin(this.t*10)), Vec.of(0,0,-1)));
+                leg_transform = leg_transform.times(Mat4.translation(Vec.of(-hinge_width, -hinge_height, -hinge_length)));
+
+                //SCALING and drawing
+                this.shapes.box.draw(graphics_state, leg_transform.times(Mat4.scale(Vec.of(leg_width,leg_height,leg_length))),this.silver);
+
+                //BOTTOM LEGS
+                //offset to correct location
+                let bottom_leg = leg_transform;
+                bottom_leg = bottom_leg.times(Mat4.translation(Vec.of(0,-2*leg_height,0)));
+
+                //FLAPPING
+                bottom_leg = bottom_leg.times(Mat4.translation(Vec.of(hinge_width,hinge_height,hinge_length)));
+                bottom_leg = bottom_leg.times(Mat4.rotation(-1 * (Math.PI/4*(Math.sin(this.t*10)-1)), Vec.of(0,0,-1)));
+                bottom_leg = bottom_leg.times(Mat4.translation(Vec.of(-hinge_width,-hinge_height,-hinge_length)));
+
+                //SCALING and drawing
+                bottom_leg = bottom_leg.times(Mat4.scale(Vec.of(leg_width,leg_height,leg_length)));
+                this.shapes.box.draw(graphics_state, bottom_leg,this.blue);
+            }
+            draw_antennae(graphics_state, antennae_transform){
+                let ant_width = .125;
+                let ant_height = .125;
+                let ant_length = .15;
+                let hinge_width = 0;
+                let hinge_height = -ant_height;
+                let hinge_length = -ant_length;
+
+                //EACH ANTENNAE
+                let orig = antennae_transform;
+                for(let i of [-1, 1]) {
+                    //correct location on ball
+                    antennae_transform = antennae_transform.times(Mat4.rotation(-1*Math.PI/4, Vec.of(1, 0, 0)));
+                    antennae_transform = antennae_transform.times(Mat4.rotation(i*Math.PI/4, Vec.of(0, 1, 0)));
+
+                    //correct offset
+                    antennae_transform = antennae_transform.times(Mat4.translation(Vec.of(0,0,this.head_all + ant_length)));
+                    this.shapes.box.draw(graphics_state, antennae_transform.times(Mat4.scale(Vec.of(ant_width,ant_height,ant_length))), this.silver);
+
+                    // small boxes
+                    let j = 0;
+                    while (j < 8) {
+                        antennae_transform = antennae_transform.times(Mat4.translation(Vec.of(0,0,2*ant_length)));
+                        antennae_transform = antennae_transform.times(Mat4.translation(Vec.of(hinge_width, hinge_height, hinge_length)));
+                        antennae_transform = antennae_transform.times(Mat4.rotation(-Math.PI/24*(Math.sin(this.t*10)-1), Vec.of(1, 0, 0)));
+                        antennae_transform = antennae_transform.times(Mat4.translation(Vec.of(-hinge_width, -hinge_height,-hinge_length)));
+                        this.shapes.box.draw(graphics_state, antennae_transform.times(Mat4.scale([ant_width, ant_height, ant_length])), this.silver);
+                        j++;
+                    }
+
+                    //BALL AT THE END
+                    antennae_transform = antennae_transform.times(Mat4.translation(Vec.of(0,0,2*ant_length)));
+                    antennae_transform = antennae_transform.times(Mat4.translation(Vec.of(hinge_width, hinge_height,hinge_length)));
+                    antennae_transform = antennae_transform.times(Mat4.rotation(-Math.PI/24*(Math.sin(this.t*10)-1), Vec.of(1, 0, 0)));
+                    antennae_transform = antennae_transform.times(Mat4.translation(Vec.of(-hinge_width, -hinge_height,-hinge_length)));
+                    this.shapes.ball.draw(graphics_state, antennae_transform.times(Mat4.scale([.2, .2, .2])), this.yellow);
+                    antennae_transform = orig;
+                }
+            }
+
+            create_butterfly(graphics_state, model_transform){
+                //HOVERING
+                model_transform = model_transform.times( Mat4.translation( Vec.of( 0,10,0 ) ) ); // Move butterfly to air
+                if (!this.hover) {
+                    model_transform = model_transform.times(Mat4.rotation(this.t * 2, Vec.of(0, 1, 0)));
+                    model_transform = model_transform.times(Mat4.translation([0, 0, Math.sin(10 * this.t * Math.PI / 4)]));
+                }
+                model_transform = model_transform.times(Mat4.translation(Vec.of(0, 0, 10)));
+                model_transform = model_transform.times(Mat4.rotation(Math.PI/2, Vec.of(-1, 4, 0)));
+
+                //WING TRANSFORM
+                let wing_transform = model_transform.times(Mat4.translation(Vec.of(2,0,0)));
+                let reflect_wing = wing_transform.times(Mat4.scale(Vec.of(-1,1,1))).times(Mat4.translation(Vec.of(4,0,0)));
+                this.draw_wing(graphics_state, wing_transform.times(Mat4.translation(Vec.of(3,this.body_height+this.wing_height,this.body_length))));
+                this.draw_wing(graphics_state, wing_transform.times(Mat4.translation(Vec.of(3,this.body_height+this.wing_height,-this.body_length))));
+                this.draw_wing(graphics_state, reflect_wing.times(Mat4.translation(Vec.of(3,this.body_height+this.wing_height,this.body_length))));
+                this.draw_wing(graphics_state, reflect_wing.times(Mat4.translation(Vec.of(3,this.body_height+this.wing_height,-this.body_length))));
+
+                //LEG
+                let leg_transform = model_transform;
+                let reflect_leg = leg_transform.times(Mat4.scale(Vec.of(-1,1,1)));
+                this.draw_leg(graphics_state, leg_transform.times(Mat4.translation(Vec.of(5*this.body_width/4,-2*this.body_height,15*this.body_length/16))));
+                this.draw_leg(graphics_state, leg_transform.times(Mat4.translation(Vec.of(5*this.body_width/4,-2*this.body_height,9*this.body_length/16))));
+                this.draw_leg(graphics_state, leg_transform.times(Mat4.translation(Vec.of(5*this.body_width/4,-2*this.body_height,4*this.body_length/16))));
+                this.draw_leg(graphics_state, reflect_leg.times(Mat4.translation(Vec.of(5*this.body_width/4,-2*this.body_height,15*this.body_length/16))));
+                this.draw_leg(graphics_state, reflect_leg.times(Mat4.translation(Vec.of(5*this.body_width/4,-2*this.body_height,9*this.body_length/16))));
+                this.draw_leg(graphics_state, reflect_leg.times(Mat4.translation(Vec.of(5*this.body_width/4,-2*this.body_height,4*this.body_length/16))));
+
+                //THORAX
+                this.shapes.box.draw( graphics_state, model_transform.times( Mat4.scale([ this.body_width,this.body_height,this.body_length ]) ), this.yellow ); // width = 1, height = 1, length = 3
+
+                //HEAD
+                this.draw_head( graphics_state, model_transform.times( Mat4.scale([ 1,1,1 ]) ) );
+
+                //ANTENNAE
+                let antennae_transform = model_transform.times(Mat4.scale([1,1,1])).times( Mat4.translation([ 0,0,this.body_length+this.head_all ]) );
+                this.draw_antennae(graphics_state, antennae_transform);
+
+                //ABDOMEN
+                this.draw_abdomen(graphics_state, model_transform.times( Mat4.scale([ 1,1, -2]) ));
+
+            }
+            ////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////// BUTTERFLY ENDS //////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////
+
             draw_head (graphics_state, head_transform) {
                 head_transform = head_transform.times( Mat4.translation([ 0, 5, 0 ]) );
-                this.shapes.sphere.draw(graphics_state, head_transform.times(Mat4.scale(Vec.of(this.head_size,this.head_size,this.head_size))), this.greyPlastic);
+                this.shapes.ball.draw(graphics_state, head_transform.times(Mat4.scale(Vec.of(this.head_size,this.head_size,this.head_size))), this.greyPlastic);
             }
             draw_arms (graphics_state, arm_transform) {
                 let hinge_width = this.arm_width;
@@ -166,7 +330,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 for (let i of [-1, 1]){
                     for (let j of [-1, 1]) {
                         wheel_transform = wheel_transform.times(Mat4.translation([this.board_width*j, -2*this.shoe_height, this.board_length*i]));
-                        this.shapes.sphere.draw(graphics_state, wheel_transform, this.blueGlass);
+                        this.shapes.ball.draw(graphics_state, wheel_transform, this.blueGlass);
                         wheel_transform = orig;
                     }
                 }
@@ -184,7 +348,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     upper_leg_transform = upper_leg_transform.times(Mat4.translation([-this.body_length/2*i,-this.body_height-this.leg_height,0])); //transfer to hinge
                     //hinge location
                     upper_leg_transform = upper_leg_transform.times(Mat4.translation(Vec.of(hinge_width, hinge_height, hinge_length)));
-                    // this.shapes.sphere.draw(graphics_state, upper_leg_transform, this.fire);
+                    // this.shapes.ball.draw(graphics_state, upper_leg_transform, this.fire);
                     upper_leg_transform = upper_leg_transform.times(Mat4.rotation(-1 + Math.PI/24*(Math.sin(this.globals.graphics_state.animation_time/100)), Vec.of(1,0,0)));
                     upper_leg_transform = upper_leg_transform.times(Mat4.translation(Vec.of(-hinge_width, -hinge_height, -hinge_length)));
                     //scale
@@ -202,7 +366,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
                     let foot_transform = bottom_leg_transform;
                     foot_transform = foot_transform.times(Mat4.translation(Vec.of(0,-this.leg_height-1, 0)));
-                    this.shapes.sphere.draw(graphics_state, foot_transform, this.fire);
+                    this.shapes.ball.draw(graphics_state, foot_transform, this.fire);
 
                     let shoe_transform = orig;
                     shoe_transform = shoe_transform.times(Mat4.translation(Vec.of(i, -this.body_height - 4.5*this.leg_height, 2*this.body_length)));
