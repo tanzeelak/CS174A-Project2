@@ -243,8 +243,14 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 body_transform = this.body_transform_next;
                 var board_transform = this.board_transform_next;
 
-                body_transform = body_transform.times(Mat4.translation([0, -2*(this.t), 0]));
-                body_transform = body_transform.times(Mat4.rotation(Math.PI/12, Vec.of(0, 1, -1)));
+                body_transform = body_transform.times(Mat4.translation([0, -4*(this.t), 0]));
+                var angle = this.t/5;
+                if (angle < Math.PI/8) {
+                    body_transform = body_transform.times(Mat4.rotation(angle, Vec.of(0, 1, 1)));
+                }
+                else{
+                    body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, 1, 1)));
+                }
 
                 this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
                 this.draw_head(graphics_state, body_transform);
@@ -252,6 +258,13 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 this.draw_legs(graphics_state, body_transform);
 
                 board_transform = board_transform.times(Mat4.translation([0, -2*(this.t), 0]));
+                angle = this.t/5;
+                if (angle < Math.PI/12) {
+                    board_transform = board_transform.times(Mat4.rotation(angle, Vec.of(0, -1, -1)));
+                }
+                else{
+                    board_transform = board_transform.times(Mat4.rotation(Math.PI/12, Vec.of(0, -1, -1)));
+                }
                 this.draw_skateboard(graphics_state, board_transform);
 
                 this.body_transform_curr = body_transform;
@@ -271,11 +284,11 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
                     var body_transform = model_transform;
 
-                    if (this.t > 0 && this.t <= 11) {
+                    if (this.t > 0 && this.t <= 12) {
                         this.scene1(graphics_state, body_transform);
                     }
-                    else if (this.t > 11) {
-                        this.time_offset = 11;
+                    else if (this.t > 12) {
+                        this.time_offset = 12;
                         console.log("scen2")
                         this.scene2(graphics_state, body_transform);
                     }
