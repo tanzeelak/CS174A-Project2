@@ -107,7 +107,8 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
             this.head_transform = Mat4.identity();
             this.body_transform_scene1 = Mat4.identity();
             this.body_transform_scene2 = Mat4.identity();
-
+            this.board_transform_curr = Mat4.identity();
+            this.board_transform_next = Mat4.identity();
 
             // Place the camera, which is stored in a scratchpad for globals.  Secondly, setup the projection:  The matrix that determines how depth is treated.  It projects 3D points onto a plane.
             Object.assign( context.globals.graphics_state, { camera_transform: Mat4.translation([ 0, 0,-25 ]), projection_transform: Mat4.perspective( Math.PI/4, context.width/context.height, .1, 1000 ) } );
@@ -220,9 +221,6 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 // var cliff_transform = Mat4.identity();
                 this.draw_cliff(graphics_state, this.cliff_transform);
 
-                console.log("this" + this.body_transform);
-                console.log("body" + body_transform);
-
                 body_transform = body_transform.times(Mat4.translation([4*this.t, 0, 0]));
                 this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
                 this.draw_head(graphics_state, body_transform);
@@ -233,27 +231,27 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 board_transform = board_transform.times(Mat4.translation([4*this.t, 0, 0]));
                 this.draw_skateboard(graphics_state, board_transform);
 
-                this.body_transform = body_transform;
-                this.board_transform = board_transform;
+                this.body_transform_scene1 = body_transform;
+                this.board_transform_next = board_transform;
             }
             scene2(graphics_state, body_transform) {
                 this.draw_cliff(graphics_state, this.cliff_transform);
 
-                body_transform = this.body_transform;
+                body_transform = this.body_transform_scene1;
+                var board_transform = this.board_transform_next;
                 // body_transform = body_transform.times(Mat4.rotation(Math.PI/4, Vec.of(1, 0, 1)));
 
-                body_transform = body_transform.times(Mat4.translation([0, -1/5, 0]));
+                body_transform = body_transform.times(Mat4.translation([0, -2*(this.t-10), 0]));
                 this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
                 this.draw_head(graphics_state, body_transform);
                 this.draw_arms(graphics_state, body_transform);
                 this.draw_legs(graphics_state, body_transform);
 
-                var board_transform = this.board_transform;
-                board_transform = board_transform.times(Mat4.translation([0, -1/5, 0]));
+                board_transform = board_transform.times(Mat4.translation([0, -2*(this.t-10), 0]));
                 this.draw_skateboard(graphics_state, board_transform);
 
-                this.body_transform = body_transform;
-                this.board_transform = board_transform;
+                this.body_transform_scene2 = body_transform;
+                this.board_transform_curr = board_transform;
             }
             display( graphics_state )
             {
