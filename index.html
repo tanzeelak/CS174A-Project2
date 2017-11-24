@@ -58,7 +58,8 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
         'tetrahedron'     : new Tetrahedron( true ),                   // re-use it many times per call to display to get multiple cubes in the scene.
         'windmill'        : new Windmill( 10 ),
         'box'             : new Cube(),
-        'ball'          : new Subdivision_Sphere(4)
+        'ball'            : new Subdivision_Sphere(4),
+        "wing"            : new Cube()
     };
     this.submit_shapes( context, shapes );
 
@@ -74,6 +75,14 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
         line_rows_func      = ( i,p ) => { return p ? Mat4.translation([0,i/50,0]).times( p.to4(1) ).to3() :  Vec.of( .01,-.05,-.1 ) },
         transform_cols_func = (j,p,i) => { return Mat4.rotation( Math.PI/8, Vec.of( 0,0,1 ) ).times( Mat4.scale([ 1.1,1.1,1.1 ])).times( Mat4.translation([ 0,0,.005 ]))
             .times( p.to4(1) ).to3() };
+
+            //BUTTER FLY
+            this.butterfly_body_length = 4;
+            this.butterfly_body_height = 1;
+            this.butterfly_body_width = 1;
+            this.head_all = 1.5;
+            this.wing_height = .2;
+            // BUTTERFLY END
 
             this.time_offset = 0;
 
@@ -142,7 +151,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 this.shapes.ball.draw( graphics_state, arm, this.blue );
             }
             draw_butterfly_head( graphics_state, model_transform )
-            { let head = model_transform.times( Mat4.translation([ 0,0,this.body_length+this.head_all ]) );
+            { let head = model_transform.times( Mat4.translation([ 0,0,this.butterfly_body_length+this.head_all ]) );
                 head = head.times(Mat4.scale(Vec.of(this.head_all,this.head_all,this.head_all)));
                 this.shapes.ball.draw( graphics_state, head, this.red );
             }
@@ -172,9 +181,9 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 this.shapes.wing.draw( graphics_state, wing_transform, this.blue );
             }
             draw_leg(graphics_state, leg_transform){
-                let leg_width = this.body_width/4;
-                let leg_height = this.body_height;
-                let leg_length = this.body_length/16;
+                let leg_width = this.butterfly_body_width/4;
+                let leg_height = this.butterfly_body_height;
+                let leg_length = this.butterfly_body_length/16;
                 let hinge_width = -leg_height/4;
                 let hinge_height = leg_height;
                 let hinge_length = 0;
@@ -242,7 +251,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 }
             }
 
-            create_butterfly(graphics_state, model_transform){
+            draw_butterfly(graphics_state, model_transform){
                 //HOVERING
                 model_transform = model_transform.times( Mat4.translation( Vec.of( 0,10,0 ) ) ); // Move butterfly to air
                 if (!this.hover) {
@@ -252,32 +261,33 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 model_transform = model_transform.times(Mat4.translation(Vec.of(0, 0, 10)));
                 model_transform = model_transform.times(Mat4.rotation(Math.PI/2, Vec.of(-1, 4, 0)));
 
-                //WING TRANSFORM
+                // //WING TRANSFORM
                 let wing_transform = model_transform.times(Mat4.translation(Vec.of(2,0,0)));
                 let reflect_wing = wing_transform.times(Mat4.scale(Vec.of(-1,1,1))).times(Mat4.translation(Vec.of(4,0,0)));
-                this.draw_wing(graphics_state, wing_transform.times(Mat4.translation(Vec.of(3,this.body_height+this.wing_height,this.body_length))));
-                this.draw_wing(graphics_state, wing_transform.times(Mat4.translation(Vec.of(3,this.body_height+this.wing_height,-this.body_length))));
-                this.draw_wing(graphics_state, reflect_wing.times(Mat4.translation(Vec.of(3,this.body_height+this.wing_height,this.body_length))));
-                this.draw_wing(graphics_state, reflect_wing.times(Mat4.translation(Vec.of(3,this.body_height+this.wing_height,-this.body_length))));
+            //    this.draw_wing(graphics_state, wing_transform);
+                this.draw_wing(graphics_state, wing_transform.times(Mat4.translation(Vec.of(3,this.butterfly_body_height+this.wing_height,this.butterfly_body_length))));
+                this.draw_wing(graphics_state, wing_transform.times(Mat4.translation(Vec.of(3,this.butterfly_body_height+this.wing_height,-this.butterfly_body_length))));
+                this.draw_wing(graphics_state, reflect_wing.times(Mat4.translation(Vec.of(3,this.butterfly_body_height+this.wing_height,this.butterfly_body_length))));
+                this.draw_wing(graphics_state, reflect_wing.times(Mat4.translation(Vec.of(3,this.butterfly_body_height+this.wing_height,-this.butterfly_body_length))));
 
                 //LEG
                 let leg_transform = model_transform;
                 let reflect_leg = leg_transform.times(Mat4.scale(Vec.of(-1,1,1)));
-                this.draw_leg(graphics_state, leg_transform.times(Mat4.translation(Vec.of(5*this.body_width/4,-2*this.body_height,15*this.body_length/16))));
-                this.draw_leg(graphics_state, leg_transform.times(Mat4.translation(Vec.of(5*this.body_width/4,-2*this.body_height,9*this.body_length/16))));
-                this.draw_leg(graphics_state, leg_transform.times(Mat4.translation(Vec.of(5*this.body_width/4,-2*this.body_height,4*this.body_length/16))));
-                this.draw_leg(graphics_state, reflect_leg.times(Mat4.translation(Vec.of(5*this.body_width/4,-2*this.body_height,15*this.body_length/16))));
-                this.draw_leg(graphics_state, reflect_leg.times(Mat4.translation(Vec.of(5*this.body_width/4,-2*this.body_height,9*this.body_length/16))));
-                this.draw_leg(graphics_state, reflect_leg.times(Mat4.translation(Vec.of(5*this.body_width/4,-2*this.body_height,4*this.body_length/16))));
+                this.draw_leg(graphics_state, leg_transform.times(Mat4.translation(Vec.of(5*this.butterfly_body_width/4,-2*this.butterfly_body_height,15*this.butterfly_body_length/16))));
+                this.draw_leg(graphics_state, leg_transform.times(Mat4.translation(Vec.of(5*this.butterfly_body_width/4,-2*this.butterfly_body_height,9*this.butterfly_body_length/16))));
+                this.draw_leg(graphics_state, leg_transform.times(Mat4.translation(Vec.of(5*this.butterfly_body_width/4,-2*this.butterfly_body_height,4*this.butterfly_body_length/16))));
+                this.draw_leg(graphics_state, reflect_leg.times(Mat4.translation(Vec.of(5*this.butterfly_body_width/4,-2*this.butterfly_body_height,15*this.butterfly_body_length/16))));
+                this.draw_leg(graphics_state, reflect_leg.times(Mat4.translation(Vec.of(5*this.butterfly_body_width/4,-2*this.butterfly_body_height,9*this.butterfly_body_length/16))));
+                this.draw_leg(graphics_state, reflect_leg.times(Mat4.translation(Vec.of(5*this.butterfly_body_width/4,-2*this.butterfly_body_height,4*this.butterfly_body_length/16))));
 
                 //THORAX
-                this.shapes.box.draw( graphics_state, model_transform.times( Mat4.scale([ this.body_width,this.body_height,this.body_length ]) ), this.yellow ); // width = 1, height = 1, length = 3
+                this.shapes.box.draw( graphics_state, model_transform.times( Mat4.scale([ this.butterfly_body_width,this.butterfly_body_height,this.butterfly_body_length ]) ), this.yellow ); // width = 1, height = 1, length = 3
 
                 //HEAD
-                this.draw_head( graphics_state, model_transform.times( Mat4.scale([ 1,1,1 ]) ) );
+                this.draw_butterfly_head( graphics_state, model_transform.times( Mat4.scale([ 1,1,1 ]) ) );
 
                 //ANTENNAE
-                let antennae_transform = model_transform.times(Mat4.scale([1,1,1])).times( Mat4.translation([ 0,0,this.body_length+this.head_all ]) );
+                let antennae_transform = model_transform.times(Mat4.scale([1,1,1])).times( Mat4.translation([ 0,0,this.butterfly_body_length+this.head_all ]) );
                 this.draw_antennae(graphics_state, antennae_transform);
 
                 //ABDOMEN
@@ -434,7 +444,34 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 this.body_transform_curr = body_transform;
                 this.board_transform_curr = board_transform;
             }
+            scene3(graphics_state, body_transform){
+                this.t = this.t - this.time_offset;
+                this.draw_cliff(graphics_state, this.cliff_transform);
 
+                body_transform = this.body_transform_curr;
+                var board_transform = this.board_transform_curr;
+
+                body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, -1, -1)));
+                body_transform = body_transform.times(Mat4.translation([0, -4*(this.t), 0]));
+                body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, 1, 1)));
+
+                this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
+                this.draw_head(graphics_state, body_transform);
+                this.draw_arms(graphics_state, body_transform);
+                this.draw_legs(graphics_state, body_transform);
+
+                board_transform = board_transform.times(Mat4.rotation(Math.PI/12, Vec.of(0, 1, 1)));
+                board_transform = board_transform.times(Mat4.translation([0, -2*(this.t), 0]));
+                board_transform = board_transform.times(Mat4.rotation(Math.PI/12, Vec.of(0, -1, -1)));
+
+                this.draw_skateboard(graphics_state, board_transform);
+
+                this.draw_butterfly(graphics_state, body_transform);
+
+                this.body_transform_next = body_transform;
+                this.board_transform_next = board_transform;
+
+            }
             display( graphics_state )
             {
                 this.t = graphics_state.animation_time/1000;
@@ -451,10 +488,14 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     if (this.t > 0 && this.t <= 12) {
                         this.scene1(graphics_state, body_transform);
                     }
-                    else if (this.t > 12) {
+                    else if (this.t > 12 && this.t <= 18) {
                         this.time_offset = 12;
                         console.log("scen2")
                         this.scene2(graphics_state, body_transform);
+                    }
+                    else if (this.t > 18) {
+                        this.time_offset =  18;
+                        this.scene3(graphics_state, body_transform);
                     }
 
 
