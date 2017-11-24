@@ -75,6 +75,8 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
         transform_cols_func = (j,p,i) => { return Mat4.rotation( Math.PI/8, Vec.of( 0,0,1 ) ).times( Mat4.scale([ 1.1,1.1,1.1 ])).times( Mat4.translation([ 0,0,.005 ]))
             .times( p.to4(1) ).to3() };
 
+            this.time_offset = 0;
+
             this.head_size = 2;
 
             this.body_height = 3;
@@ -235,20 +237,21 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 this.board_transform_next = board_transform;
             }
             scene2(graphics_state, body_transform) {
+                this.t = this.t - this.time_offset;
                 this.draw_cliff(graphics_state, this.cliff_transform);
 
                 body_transform = this.body_transform_next;
                 var board_transform = this.board_transform_next;
 
-                body_transform = body_transform.times(Mat4.translation([0, -2*(this.t-10), 0]));
-                // body_transform = body_transform.times(Mat4.rotation(Math.PI/12, Vec.of(0, 1, -1)));
+                body_transform = body_transform.times(Mat4.translation([0, -2*(this.t), 0]));
+                body_transform = body_transform.times(Mat4.rotation(Math.PI/12, Vec.of(0, 1, -1)));
 
                 this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
                 this.draw_head(graphics_state, body_transform);
                 this.draw_arms(graphics_state, body_transform);
                 this.draw_legs(graphics_state, body_transform);
 
-                board_transform = board_transform.times(Mat4.translation([0, -2*(this.t-10), 0]));
+                board_transform = board_transform.times(Mat4.translation([0, -2*(this.t), 0]));
                 this.draw_skateboard(graphics_state, board_transform);
 
                 this.body_transform_curr = body_transform;
@@ -268,10 +271,11 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
                     var body_transform = model_transform;
 
-                    if (this.t > 0 && this.t <= 10) {
+                    if (this.t > 0 && this.t <= 11) {
                         this.scene1(graphics_state, body_transform);
                     }
-                    else if (this.t > 10) {
+                    else if (this.t > 11) {
+                        this.time_offset = 11;
                         console.log("scen2")
                         this.scene2(graphics_state, body_transform);
                     }
