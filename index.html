@@ -116,10 +116,14 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
             this.body_transform = Mat4.identity();
             this.board_transform = Mat4.identity();
             this.head_transform = Mat4.identity();
+            this.branch_transform = Mat4.identity();
+            this.butterfly_transform = Mat4.identity();
             this.body_transform_next = Mat4.identity();
             this.body_transform_curr = Mat4.identity();
             this.board_transform_curr = Mat4.identity();
             this.board_transform_next = Mat4.identity();
+            this.butterfly_transform_curr = Mat4.identity();
+            this.butterfly_transform_next = Mat4.identity();
 
             // Place the camera, which is stored in a scratchpad for globals.  Secondly, setup the projection:  The matrix that determines how depth is treated.  It projects 3D points onto a plane.
             Object.assign( context.globals.graphics_state, { camera_transform: Mat4.translation([ 0, 0,-25 ]), projection_transform: Mat4.perspective( Math.PI/4, context.width/context.height, .1, 1000 ) } );
@@ -139,13 +143,14 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 fire         : context.get_instance( Funny_Shader ).material(),
                 stars        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,1,1 ), .5, .5, .5, 40, context.get_instance( "assets/stars.png" ) ) } );
             }
+            ////////////////////////////////////////////////////////////////////////////
+            ////////////////////////////////////// CUSTOM SHAPE //////////////////////////////////////
+            ////////////////////////////////////////////////////////////////////////////
 
 
             ////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////// BUTTERFLY CODE //////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
-
-
             draw_arm( graphics_state, model_transform )
             { const arm = model_transform.times( Mat4.translation([ 0,0,3+1 ]) );
                 this.shapes.ball.draw( graphics_state, arm, this.blue );
@@ -253,9 +258,9 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
             draw_butterfly(graphics_state, model_transform){
                 //HOVERING
-                model_transform = model_transform.times( Mat4.translation( Vec.of( 0,10,0 ) ) ); // Move butterfly to air
+                // model_transform = model_transform.times( Mat4.translation( Vec.of( 0,10,0 ) ) ); // Move butterfly to air
                 if (!this.hover) {
-                    model_transform = model_transform.times(Mat4.rotation(this.t * 2, Vec.of(0, 1, 0)));
+                    // model_transform = model_transform.times(Mat4.rotation(this.t * 2, Vec.of(0, 1, 0)));
                     model_transform = model_transform.times(Mat4.translation([0, 0, Math.sin(10 * this.t * Math.PI / 4)]));
                 }
                 model_transform = model_transform.times(Mat4.translation(Vec.of(0, 0, 10)));
@@ -292,7 +297,6 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
                 //ABDOMEN
                 this.draw_abdomen(graphics_state, model_transform.times( Mat4.scale([ 1,1, -2]) ));
-
             }
             ////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////// BUTTERFLY ENDS //////////////////////////////////////
@@ -314,11 +318,9 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     //correct location
                     upper_arm_transform = upper_arm_transform.times(Mat4.translation([-1.25*this.body_length*i,this.body_height/3,0])); //transfer to hinge
 
-
                     //hinge location
                     upper_arm_transform = upper_arm_transform.times(Mat4.translation(Vec.of(hinge_width*i, hinge_height, hinge_length)));
                     upper_arm_transform = upper_arm_transform.times(Mat4.rotation(-1 + Math.PI/12*(Math.sin(this.globals.graphics_state.animation_time/100)), Vec.of(0,0,1*i)));
-
                     upper_arm_transform = upper_arm_transform.times(Mat4.translation(Vec.of(-hinge_width*i, -hinge_height, -hinge_length)));
 
                     //scaling
@@ -391,6 +393,10 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 cliff_transform = cliff_transform.times(Mat4.translation(Vec.of(0, -this.body_height - 4.5*this.leg_height - 2*this.shoe_height -2.5 - this.cliff_height, 2*this.body_length)));
                 this.shapes.box.draw(graphics_state, cliff_transform.times(Mat4.scale(Vec.of(this.cliff_width, this.cliff_height, this.cliff_length))), this.greenGrass);
             }
+            draw_branch(graphics_state, branch_transform) {
+                branch_transform = branch_transform.times(Mat4.translation([this.cliff_width+7*this.butterfly_body_width, -1.5*this.cliff_height, 0]));
+                this.shapes.box.draw(graphics_state, branch_transform.times(Mat4.scale(Vec.of(7,7,7))), this.purplePlastic)
+            }
             scene1(graphics_state, body_transform) {
                 //camera, looking at, up
                 // graphics_state.camera_transform = Mat4.look_at( Vec.of( -20,0, 80), Vec.of( 0,0,0 ), Vec.of( 0,1,0 ) );
@@ -450,6 +456,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
                 body_transform = this.body_transform_curr;
                 var board_transform = this.board_transform_curr;
+                var butterfly_transform = this.butterfly_transform_curr;
 
                 body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, -1, -1)));
                 body_transform = body_transform.times(Mat4.translation([0, -4*(this.t), 0]));
@@ -463,14 +470,20 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 board_transform = board_transform.times(Mat4.rotation(Math.PI/12, Vec.of(0, 1, 1)));
                 board_transform = board_transform.times(Mat4.translation([0, -2*(this.t), 0]));
                 board_transform = board_transform.times(Mat4.rotation(Math.PI/12, Vec.of(0, -1, -1)));
-
+                //elastic jump
+                //board_transform = board_transform.times(Mat4.translation([0, Math.abs(Math.sin(this.t)) * 50 / this.t, 0]))
                 this.draw_skateboard(graphics_state, board_transform);
 
-                this.draw_butterfly(graphics_state, body_transform);
+                var branch_transform = this.branch_transform;
+                this.draw_branch(graphics_state, branch_transform);
+
+                var butterfly_transform = this.butterfly_transform;
+                butterfly_transform = butterfly_transform.times(Mat4.translation([this.cliff_width+7*this.butterfly_body_width, -1.5*this.cliff_height, 0]))
+                this.draw_butterfly(graphics_state, butterfly_transform);
 
                 this.body_transform_next = body_transform;
                 this.board_transform_next = board_transform;
-
+                this.butterfly_transform_next = butterfly_transform;
             }
             display( graphics_state )
             {
