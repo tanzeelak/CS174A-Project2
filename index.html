@@ -304,11 +304,11 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
             ////////////////////////////////////// BUTTERFLY ENDS //////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
 
-            draw_head (graphics_state, head_transform) {
+            draw_head (graphics_state, head_transform, scene) {
                 head_transform = head_transform.times( Mat4.translation([ 0, 5, 0 ]) );
                 this.shapes.ball.draw(graphics_state, head_transform.times(Mat4.scale(Vec.of(this.head_size,this.head_size,this.head_size))), this.greyPlastic);
             }
-            draw_arms (graphics_state, arm_transform) {
+            draw_arms (graphics_state, arm_transform, scene) {
                 let hinge_width = this.arm_width;
                 let hinge_height = this.arm_height;
                 let hinge_length = 0;
@@ -333,7 +333,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     upper_arm_transform = orig;
                 }
             }
-            draw_skateboard(graphics_state, board_transform) {
+            draw_skateboard(graphics_state, board_transform, scene) {
                 // board_transform = board_transform.times(Mat4.translation(Vec.of(this.leg_width,-5*this.leg_height/4,0)));
 
                 board_transform = board_transform.times(Mat4.translation(Vec.of(0, -this.body_height - 4.5*this.leg_height - 1.75*this.shoe_height, 2*this.body_length)));
@@ -349,11 +349,10 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     }
                 }
             }
-            draw_legs(graphics_state, leg_transform) {
+            draw_legs(graphics_state, leg_transform, scene) {
                 let hinge_width = 0;
                 let hinge_height = this.leg_height;
                 let hinge_length = this.leg_length;
-
 
                 var upper_leg_transform = leg_transform;
                 var orig = upper_leg_transform;
@@ -388,11 +387,11 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     upper_leg_transform = orig;
                 }
             }
-            draw_cliff(graphics_state, cliff_transform) {
+            draw_cliff(graphics_state, cliff_transform, scene) {
                 cliff_transform = cliff_transform.times(Mat4.translation(Vec.of(0, -this.body_height - 4.5*this.leg_height - 2*this.shoe_height -2.5 - this.cliff_height, 2*this.body_length)));
                 this.shapes.box.draw(graphics_state, cliff_transform.times(Mat4.scale(Vec.of(this.cliff_width, this.cliff_height, this.cliff_length))), this.greenGrass);
             }
-            draw_branch(graphics_state, branch_transform) {
+            draw_branch(graphics_state, branch_transform, scene) {
                 var branchOffset_width = this.cliff_width+7*this.butterfly_body_width;
                 var branchOffset_height = -1*this.cliff_height;
                 var branchOffset_length = 3;
@@ -419,35 +418,34 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     this.shapes.box.draw(graphics_state, small_branch.times(Mat4.scale([small_branch_width, small_branch_height, small_branch_length])), this.brown);
                 }
             }
-            draw_person(graphics_state, body_transform) {
+            draw_person(graphics_state, body_transform, scene) {
 
             }
             scene1(graphics_state, body_transform) {
                 //camera, looking at, up
                 // graphics_state.camera_transform = Mat4.look_at( Vec.of( -20,0, 80), Vec.of( 0,0,0 ), Vec.of( 0,1,0 ) );
                 // var cliff_transform = Mat4.identity();
-                this.draw_cliff(graphics_state, this.cliff_transform);
+                this.draw_cliff(graphics_state, this.cliff_transform, 1);
 
                 body_transform = body_transform.times(Mat4.translation([4*this.t, 0, 0]));
                 this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
-                this.draw_head(graphics_state, body_transform);
-                this.draw_arms(graphics_state, body_transform);
-                this.draw_legs(graphics_state, body_transform);
+                this.draw_head(graphics_state, body_transform, 1);
+                this.draw_arms(graphics_state, body_transform, 1);
+                this.draw_legs(graphics_state, body_transform, 1);
 
                 var board_transform = Mat4.identity();
                 board_transform = board_transform.times(Mat4.translation([4*this.t, 0, 0]));
-                this.draw_skateboard(graphics_state, board_transform);
+                this.draw_skateboard(graphics_state, board_transform, 1);
 
                 this.body_transform_next = body_transform;
                 this.board_transform_next = board_transform;
             }
             scene2(graphics_state, body_transform) {
                 this.t = this.t - this.time_offset;
-
                 body_transform = this.body_transform_next;
                 var board_transform = this.board_transform_next;
 
-                this.draw_cliff(graphics_state, this.cliff_transform);
+                this.draw_cliff(graphics_state, this.cliff_transform, 1);
 
                 body_transform = body_transform.times(Mat4.translation([0, -5*(this.t), 0]));
                 var angle = this.t/5;
@@ -499,14 +497,14 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 this.draw_legs(graphics_state, body_transform);
 
                 //elastic jump
-                board_transform = board_transform.times(Mat4.translation([0, .2*Math.abs(Math.sin(this.t)) * 50, 0]))
+                board_transform = board_transform.times(Mat4.translation([0, 10*Math.abs(Math.sin(this.t)), 0]))
                 this.draw_skateboard(graphics_state, board_transform);
 
                 var branch_transform = this.branch_transform;
                 this.draw_branch(graphics_state, branch_transform);
 
                 var butterfly_transform = this.butterfly_transform;
-                butterfly_transform = butterfly_transform.times(Mat4.translation([this.cliff_width+7*this.butterfly_body_width, -1.5*this.cliff_height, 0]))
+                butterfly_transform = butterfly_transform.times(Mat4.translation([this.cliff_width+7*this.butterfly_body_width, -1.5*this.cliff_height, -10]))
                 this.draw_butterfly(graphics_state, butterfly_transform);
 
                 this.body_transform_next = body_transform;
@@ -523,26 +521,28 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 var branch_transform = this.branch_transform_next;
 
                 this.draw_cliff(graphics_state, this.cliff_transform);
-                body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, -1, -1)));
-                body_transform = body_transform.times(Mat4.translation([0, -5*(this.t), 0]));
-                body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, 1, 1)));
 
+                body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, -1, -1)));
+                body_transform = body_transform.times(Mat4.rotation(Math.PI/2, Vec.of(0, 1, 0)));
+                body_transform = body_transform.times(Mat4.translation([0, 0, 3*this.t]));
+                // body_transform = body_transform.times(Mat4.translation([0, -5*(this.t), 0]));
+                // body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, 1, 1)));
                 this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
                 this.draw_head(graphics_state, body_transform);
                 this.draw_arms(graphics_state, body_transform);
                 this.draw_legs(graphics_state, body_transform);
 
                 //elastic jump
-                board_transform = board_transform.times(Mat4.translation([0, .2*Math.abs(Math.sin(this.t)) * 50, 0]))
+                board_transform = board_transform.times(Mat4.translation([0, 10*Math.abs(Math.sin(this.t)), 0]))
                 this.draw_skateboard(graphics_state, board_transform);
 
                 var branch_transform = this.branch_transform;
                 this.draw_branch(graphics_state, branch_transform);
 
                 var butterfly_transform = this.butterfly_transform;
-                butterfly_transform = butterfly_transform.times(Mat4.translation([this.cliff_width+7*this.butterfly_body_width, -1.5*this.cliff_height, 0]))
+                butterfly_transform = butterfly_transform.times(Mat4.translation([this.cliff_width+7*this.butterfly_body_width, -1.5*this.cliff_height, -10]))
+                butterfly_transform = butterfly_transform.times(Mat4.translation([3*this.t, 0, 0]));
                 this.draw_butterfly(graphics_state, butterfly_transform);
-
 
                 this.body_transform_curr = body_transform;
                 this.board_transform_curr = board_transform;
