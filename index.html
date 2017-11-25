@@ -124,6 +124,8 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
             this.board_transform_next = Mat4.identity();
             this.butterfly_transform_curr = Mat4.identity();
             this.butterfly_transform_next = Mat4.identity();
+            this.branch_transform_curr = Mat4.identity();
+            this.branch_transform_next = Mat4.identity();
 
             // Place the camera, which is stored in a scratchpad for globals.  Secondly, setup the projection:  The matrix that determines how depth is treated.  It projects 3D points onto a plane.
             Object.assign( context.globals.graphics_state, { camera_transform: Mat4.translation([ 0, 0,-25 ]), projection_transform: Mat4.perspective( Math.PI/4, context.width/context.height, .1, 1000 ) } );
@@ -395,11 +397,11 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
             }
             draw_branch(graphics_state, branch_transform) {
                 var branchOffset_width = this.cliff_width+7*this.butterfly_body_width;
-                var branchOffset_height = -1.5*this.cliff_height;
-                var branchOffset_length = 0;
-                var small_branch_width = 10;
-                var small_branch_height = 10;
-                var small_branch_length = 10;
+                var branchOffset_height = -1*this.cliff_height;
+                var branchOffset_length = 3;
+                var small_branch_width = .5;
+                var small_branch_height = .5;
+                var small_branch_length = 2;
 
                 var small_branch = branch_transform;
 
@@ -408,13 +410,17 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 branch_transform = branch_transform.times(Mat4.translation([7,0,0]));
                 this.shapes.ball.draw(graphics_state, branch_transform.times(Mat4.scale(Vec.of(2,2,2))), this.brown);
 
+                var small_branch = branch_transform.times(Mat4.translation([2,0,0]));
+
                 var orig = small_branch;
                 for (let i of [-1,1]) {
                     small_branch = small_branch.times(Mat4.rotation(-1*Math.PI/4, Vec.of(1, 0, 0)));
                     small_branch = small_branch.times(Mat4.rotation(i*Math.PI/4, Vec.of(0, 1, 0)));
-                    this.shapes.box.draw(graphics_state, small_branch.times(Mat4.scale([small_branch_width, small_branch_height, small_branch_length])), this.silver);
-                }
+                    small_branch = small_branch.times(Mat4.rotation(i*Math.PI/4, Vec.of(0, 1, 0)));
+                    small_branch = small_branch.times(Mat4.translation(Vec.of(small_branch_width,0,0)));
 
+                    this.shapes.box.draw(graphics_state, small_branch.times(Mat4.scale([small_branch_width, small_branch_height, small_branch_length])), this.brown);
+                }
             }
             scene1(graphics_state, body_transform) {
                 //camera, looking at, up
@@ -442,7 +448,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 body_transform = this.body_transform_next;
                 var board_transform = this.board_transform_next;
 
-                body_transform = body_transform.times(Mat4.translation([0, -4*(this.t), 0]));
+                body_transform = body_transform.times(Mat4.translation([0, -5*(this.t), 0]));
                 var angle = this.t/5;
                 if (angle < Math.PI/8) {
                     body_transform = body_transform.times(Mat4.rotation(angle, Vec.of(0, 1, 1)));
@@ -456,7 +462,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 this.draw_arms(graphics_state, body_transform);
                 this.draw_legs(graphics_state, body_transform);
 
-                board_transform = board_transform.times(Mat4.translation([0, -2*(this.t), 0]));
+                board_transform = board_transform.times(Mat4.translation([0, -4*(this.t), 0]));
                 angle = this.t/5;
                 if (angle < Math.PI/12) {
                     board_transform = board_transform.times(Mat4.rotation(angle, Vec.of(0, -1, -1)));
@@ -466,8 +472,12 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 }
                 this.draw_skateboard(graphics_state, board_transform);
 
+                var branch_transform = this.branch_transform;
+                this.draw_branch(graphics_state, branch_transform);
+
                 this.body_transform_curr = body_transform;
                 this.board_transform_curr = board_transform;
+                this.branch_transform_curr = branch_transform;
             }
             scene3(graphics_state, body_transform){
                 this.t = this.t - this.time_offset;
@@ -476,9 +486,10 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 body_transform = this.body_transform_curr;
                 var board_transform = this.board_transform_curr;
                 var butterfly_transform = this.butterfly_transform_curr;
+                var branch_transform = this.branch_transform_curr;
 
                 body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, -1, -1)));
-                body_transform = body_transform.times(Mat4.translation([0, -4*(this.t), 0]));
+                body_transform = body_transform.times(Mat4.translation([0, -5*(this.t), 0]));
                 body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, 1, 1)));
 
                 this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
@@ -486,11 +497,11 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 this.draw_arms(graphics_state, body_transform);
                 this.draw_legs(graphics_state, body_transform);
 
-                board_transform = board_transform.times(Mat4.rotation(Math.PI/12, Vec.of(0, 1, 1)));
-                board_transform = board_transform.times(Mat4.translation([0, -2*(this.t), 0]));
-                board_transform = board_transform.times(Mat4.rotation(Math.PI/12, Vec.of(0, -1, -1)));
+                // board_transform = board_transform.times(Mat4.rotation(Math.PI/12, Vec.of(0, 1, 1)));
+                // board_transform = board_transform.times(Mat4.translation([0, -2*(this.t), 0]));
+                // board_transform = board_transform.times(Mat4.rotation(Math.PI/12, Vec.of(0, -1, -1)));
                 //elastic jump
-                //board_transform = board_transform.times(Mat4.translation([0, Math.abs(Math.sin(this.t)) * 50 / this.t, 0]))
+                board_transform = board_transform.times(Mat4.translation([0, .2*Math.abs(Math.sin(this.t)) * 50, 0]))
                 this.draw_skateboard(graphics_state, board_transform);
 
                 var branch_transform = this.branch_transform;
@@ -503,6 +514,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 this.body_transform_next = body_transform;
                 this.board_transform_next = board_transform;
                 this.butterfly_transform_next = butterfly_transform;
+                this.branch_transform_next = branch_transform;
             }
             display( graphics_state )
             {
@@ -520,13 +532,13 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     if (this.t > 0 && this.t <= 12) {
                         this.scene1(graphics_state, body_transform);
                     }
-                    else if (this.t > 12 && this.t <= 18) {
+                    else if (this.t > 12 && this.t <= 20) {
                         this.time_offset = 12;
                         console.log("scen2")
                         this.scene2(graphics_state, body_transform);
                     }
-                    else if (this.t > 18) {
-                        this.time_offset =  18;
+                    else if (this.t > 20) {
+                        this.time_offset =  20;
                         this.scene3(graphics_state, body_transform);
                     }
 
