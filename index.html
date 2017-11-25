@@ -394,8 +394,27 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 this.shapes.box.draw(graphics_state, cliff_transform.times(Mat4.scale(Vec.of(this.cliff_width, this.cliff_height, this.cliff_length))), this.greenGrass);
             }
             draw_branch(graphics_state, branch_transform) {
-                branch_transform = branch_transform.times(Mat4.translation([this.cliff_width+7*this.butterfly_body_width, -1.5*this.cliff_height, 0]));
-                this.shapes.box.draw(graphics_state, branch_transform.times(Mat4.scale(Vec.of(7,7,7))), this.purplePlastic)
+                var branchOffset_width = this.cliff_width+7*this.butterfly_body_width;
+                var branchOffset_height = -1.5*this.cliff_height;
+                var branchOffset_length = 0;
+                var small_branch_width = 10;
+                var small_branch_height = 10;
+                var small_branch_length = 10;
+
+                var small_branch = branch_transform;
+
+                branch_transform = branch_transform.times(Mat4.translation([branchOffset_width, branchOffset_height, branchOffset_length]));
+                this.shapes.box.draw(graphics_state, branch_transform.times(Mat4.scale(Vec.of(7,1,1))), this.brown);
+                branch_transform = branch_transform.times(Mat4.translation([7,0,0]));
+                this.shapes.ball.draw(graphics_state, branch_transform.times(Mat4.scale(Vec.of(2,2,2))), this.brown);
+
+                var orig = small_branch;
+                for (let i of [-1,1]) {
+                    small_branch = small_branch.times(Mat4.rotation(-1*Math.PI/4, Vec.of(1, 0, 0)));
+                    small_branch = small_branch.times(Mat4.rotation(i*Math.PI/4, Vec.of(0, 1, 0)));
+                    this.shapes.box.draw(graphics_state, small_branch.times(Mat4.scale([small_branch_width, small_branch_height, small_branch_length])), this.silver);
+                }
+
             }
             scene1(graphics_state, body_transform) {
                 //camera, looking at, up
