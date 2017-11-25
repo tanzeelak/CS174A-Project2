@@ -52,29 +52,38 @@
 class Tutorial_Animation extends Scene_Component  // An example of a Scene_Component that our class Canvas_Manager can manage.  Like most, this one draws 3D shapes.
 { constructor( context )
     { super( context );
-        var shapes = { 'triangle'        : new Triangle(),                            // At the beginning of our program, instantiate all shapes we plan to use,
-        'strip'           : new Square(),                              // each with only one instance in the graphics card's memory.
-        'bad_tetrahedron' : new Tetrahedron( false ),                  // For example we would only create one "cube" blueprint in the GPU, but then
-        'tetrahedron'     : new Tetrahedron( true ),                   // re-use it many times per call to display to get multiple cubes in the scene.
-        'windmill'        : new Windmill( 10 ),
-        'box'             : new Cube(),
-        'ball'            : new Subdivision_Sphere(4),
-        "wing"            : new Cube()
+
+        let square_array = Vec.cast( [ 1,0,-1 ], [ 0,1,-1 ], [ -1,0,-1 ], [ 0,-1,-1 ], [ 1,0,-1 ] ),               // Some helper arrays of points located along
+              star_array = Array(19).fill( Vec.of( 1,0,-1 ) ), circle_array = Array(40).fill( Vec.of( 1,0,-1 ) );  // curves.  We'll extrude these into surfaces.
+        circle_array = circle_array.map( (x,i,a) => Mat4.rotation( i/(a.length-1) * 2*Math.PI, Vec.of( 0,0,1 ) ).times( x.to4(1) ).to3() );
+        star_array   =   star_array.map( (x,i,a) => Mat4.rotation( i/(a.length-1) * 2*Math.PI, Vec.of( 0,0,1 ) ).times( Mat4.translation([ (i%2)/2,0,0 ]) ).times( x.to4(1) ).to3() );
+
+        let sin_rows_func       =      i  => { return Vec.of( .5 + Math.sin(777*i)/4, 2-4*i, 0 ) },                                   // Different callbacks for telling Grid_Patch
+        sin_columns_func    = ( j,p ) => { return Mat4.translation([ Math.sin(777*j)/4,0,4/30    ]).times( p.to4(1) ).to3() },    // how it chould advance to the next row/column.
+        rotate_columns_func = ( j,p ) => { return Mat4.rotation( .1*j*Math.PI, Vec.of( 0,1,0 )    ).times( p.to4(1) ).to3() },
+        sample_square_func  =      i  => { return Grid_Patch.sample_array( square_array, i ) },
+        sample_star_func    =      i  => { return Grid_Patch.sample_array( star_array,   i ) },
+        sample_circle_func  =      i  => { return Grid_Patch.sample_array( circle_array, i ) },
+        sample_two_arrays   = (j,p,i) => { return Mat4.translation([0,0,2*j]).times( sample_star_func(i).mix( sample_circle_func(i), j ).to4(1) ).to3() },
+        sample_two_arrays2  = (j,p,i) => { return Mat4.rotation( .5*j*Math.PI, Vec.of( 1,1,1 ) ).times(
+            Mat4.translation([0,0,2*j]).times( sample_star_func(i).mix( sample_square_func(i), j ).to4(1) ) ).to3() },
+            line_rows_func      = ( i,p ) => { return p ? Mat4.translation([0,i/50,0]).times( p.to4(1) ).to3() :  Vec.of( .01,-.05,-.1 ) },
+            transform_cols_func = (j,p,i) => { return Mat4.rotation( Math.PI/8, Vec.of( 0,0,1 ) ).times( Mat4.scale([ 1.1,1.1,1.1 ])).times( Mat4.translation([ 0,0,.005 ]))
+                .times( p.to4(1) ).to3() };
+
+        var shapes = {
+            'triangle'        : new Triangle(),                            // At the beginning of our program, instantiate all shapes we plan to use,
+            'strip'             : new Square(),                              // each with only one instance in the graphics card's memory.
+            'bad_tetrahedron'   : new Tetrahedron( false ),                  // For example we would only create one "cube" blueprint in the GPU, but then
+            'tetrahedron'       : new Tetrahedron( true ),                   // re-use it many times per call to display to get multiple cubes in the scene.
+            'windmill'          : new Windmill( 10 ),
+            'box'               : new Cube(),
+            'ball'              : new Subdivision_Sphere(4),
+            'wing'              : new Cube(),
+            'ghost'             : new Grid_Patch( 36, 10, sample_star_func, sample_two_arrays,  [[0,1],[0,1]] ),
     };
     this.submit_shapes( context, shapes );
 
-    let sin_rows_func       =      i  => { return Vec.of( .5 + Math.sin(777*i)/4, 2-4*i, 0 ) },                                   // Different callbacks for telling Grid_Patch
-    sin_columns_func    = ( j,p ) => { return Mat4.translation([ Math.sin(777*j)/4,0,4/30    ]).times( p.to4(1) ).to3() },    // how it chould advance to the next row/column.
-    rotate_columns_func = ( j,p ) => { return Mat4.rotation( .1*j*Math.PI, Vec.of( 0,1,0 )    ).times( p.to4(1) ).to3() },
-    sample_square_func  =      i  => { return Grid_Patch.sample_array( square_array, i ) },
-    sample_star_func    =      i  => { return Grid_Patch.sample_array( star_array,   i ) },
-    sample_circle_func  =      i  => { return Grid_Patch.sample_array( circle_array, i ) },
-    sample_two_arrays   = (j,p,i) => { return Mat4.translation([0,0,2*j]).times( sample_star_func(i).mix( sample_circle_func(i), j ).to4(1) ).to3() },
-    sample_two_arrays2  = (j,p,i) => { return Mat4.rotation( .5*j*Math.PI, Vec.of( 1,1,1 ) ).times(
-        Mat4.translation([0,0,2*j]).times( sample_star_func(i).mix( sample_square_func(i), j ).to4(1) ) ).to3() },
-        line_rows_func      = ( i,p ) => { return p ? Mat4.translation([0,i/50,0]).times( p.to4(1) ).to3() :  Vec.of( .01,-.05,-.1 ) },
-        transform_cols_func = (j,p,i) => { return Mat4.rotation( Math.PI/8, Vec.of( 0,0,1 ) ).times( Mat4.scale([ 1.1,1.1,1.1 ])).times( Mat4.translation([ 0,0,.005 ]))
-            .times( p.to4(1) ).to3() };
 
             //BUTTER FLY
             this.butterfly_body_length = 4;
@@ -439,7 +448,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     this.shapes.box.draw(graphics_state, small_branch.times(Mat4.scale([small_branch_width, small_branch_height, small_branch_length])), this.brown);
                 }
             }
-            draw_person(graphics_state, body_transform, scene) {
+            draw_cave(graphics_state, cave_transform) {
 
             }
             scene1(graphics_state, body_transform) {
@@ -573,6 +582,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
                 body_transform = body_transform.times(Mat4.translation([0, 3*Math.sin(3*this.t), 3*this.t]));
                 this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
+                // this.shapes.ghost.draw(graphics_state, body_transform.times(Mat4.scale(Vec.of(10,10,10))), this.purplePlastic);
                 this.draw_head(graphics_state, body_transform, 5);
                 this.draw_arms(graphics_state, body_transform, 5);
                 this.draw_legs(graphics_state, body_transform, 5);
@@ -609,7 +619,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     let timeScene2 = 12;
                     let timeScene3 = 20;
                     let timeScene4 = 26.6;
-                    let timeScene5 = 31.6;
+                    let timeScene5 = 28;
 
                     if (this.t > 0 && this.t <= timeScene2) {
                         console.log(1);
