@@ -514,7 +514,6 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
             }
             scene4(graphics_state, body_transform){
                 this.t = this.t - this.time_offset;
-
                 body_transform = this.body_transform_next;
                 var board_transform = this.board_transform_next;
                 var butterfly_transform = this.butterfly_transform_next;
@@ -524,9 +523,8 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
                 body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, -1, -1)));
                 body_transform = body_transform.times(Mat4.rotation(Math.PI/2, Vec.of(0, 1, 0)));
-                body_transform = body_transform.times(Mat4.translation([0, 0, 3*this.t]));
-                // body_transform = body_transform.times(Mat4.translation([0, -5*(this.t), 0]));
-                // body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, 1, 1)));
+                // body_transform = body_transform.times(Mat4.translation([0, 0, 3*this.t]));
+
                 this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
                 this.draw_head(graphics_state, body_transform);
                 this.draw_arms(graphics_state, body_transform);
@@ -536,18 +534,48 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 board_transform = board_transform.times(Mat4.translation([0, 10*Math.abs(Math.sin(this.t)), 0]))
                 this.draw_skateboard(graphics_state, board_transform);
 
-                var branch_transform = this.branch_transform;
+                branch_transform = this.branch_transform;
                 this.draw_branch(graphics_state, branch_transform);
 
-                var butterfly_transform = this.butterfly_transform;
+                butterfly_transform = this.butterfly_transform;
                 butterfly_transform = butterfly_transform.times(Mat4.translation([this.cliff_width+7*this.butterfly_body_width, -1.5*this.cliff_height, -10]))
-                butterfly_transform = butterfly_transform.times(Mat4.translation([3*this.t, 0, 0]));
+                // butterfly_transform = butterfly_transform.times(Mat4.translation([3*this.t, 0, 0]));
                 this.draw_butterfly(graphics_state, butterfly_transform);
 
                 this.body_transform_curr = body_transform;
                 this.board_transform_curr = board_transform;
                 this.butterfly_transform_curr = butterfly_transform;
                 this.branch_transform_curr = branch_transform;
+            }
+            scene5(graphics_state, body_transform){
+                this.t = this.t - this.time_offset;
+                body_transform = this.body_transform_curr;
+                var board_transform = this.board_transform_curr;
+                var butterfly_transform = this.butterfly_transform_curr;
+                var branch_transform = this.branch_transform_curr;
+
+                this.draw_cliff(graphics_state, this.cliff_transform);
+
+                body_transform = body_transform.times(Mat4.translation([0, 0, 3*this.t]));
+                this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
+                this.draw_head(graphics_state, body_transform);
+                this.draw_arms(graphics_state, body_transform);
+                this.draw_legs(graphics_state, body_transform);
+
+                //elastic jump
+                board_transform = board_transform.times(Mat4.translation([0, 10*Math.abs(Math.sin(this.t)), 0]))
+                this.draw_skateboard(graphics_state, board_transform);
+
+                branch_transform = this.branch_transform;
+                this.draw_branch(graphics_state, branch_transform);
+
+                butterfly_transform = butterfly_transform.times(Mat4.translation([3*this.t, 0, 0]));
+                this.draw_butterfly(graphics_state, butterfly_transform);
+
+                this.body_transform_next = body_transform;
+                this.board_transform_next = board_transform;
+                this.butterfly_transform_next = butterfly_transform;
+                this.branch_transform_next = branch_transform;
             }
             display( graphics_state )
             {
@@ -566,6 +594,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     let timeScene2 = 12;
                     let timeScene3 = 20;
                     let timeScene4 = 26.6;
+                    let timeScene5 = 28;
 
                     if (this.t > 0 && this.t <= timeScene2) {
                         //skateboarding
@@ -574,7 +603,6 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     else if (this.t > timeScene2 && this.t <= timeScene3) {
                         //animate curve of fall, fall, branch appears
                         this.time_offset = timeScene2;
-                        console.log("scen2")
                         this.scene2(graphics_state, body_transform);
                     }
                     else if (this.t > timeScene3 && this.t <= timeScene4) {
@@ -582,10 +610,15 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                         this.time_offset =  timeScene3;
                         this.scene3(graphics_state, body_transform);
                     }
-                    else if (this.t > timeScene4) {
+                    else if (this.t > timeScene4 && this.t <= timeScene5) {
                         //person sits on butterfly and butterfly moves?
                         this.time_offset = timeScene4;
                         this.scene4(graphics_state, body_transform);
+                    }
+                    else if (this.t > timeScene5) {
+                        //person and butterfly move
+                        this.time_offset = timeScene5;
+                        this.scene5(graphics_state, body_transform);
                     }
 
 
