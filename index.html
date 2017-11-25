@@ -358,11 +358,21 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 var orig = upper_leg_transform;
                 for (let i of [-1,1]) {
                     //correct location
-                    if (scene <= 3){
+                    if (scene <= 1){
                         upper_leg_transform = upper_leg_transform.times(Mat4.translation([-this.body_length/2*i,-this.body_height-this.leg_height,0])); //transfer to hinge
                     }
                     else{
+                        // var pos = this.t/10;
+                        // console.log(-this.body_length/2*i);
+                        // console.log("pos" pos);
+                        // if (pos < Math.abs(-this.body_length*i)){
+                        //     upper_leg_transform = upper_leg_transform.times(Mat4.translation([-this.body_length*i*pos,-this.body_height-this.leg_height,0])); //transfer to hinge
+                        // }
+                        // else{
                         upper_leg_transform = upper_leg_transform.times(Mat4.translation([-this.body_length*i,-this.body_height-this.leg_height,0])); //transfer to hinge
+
+                        // }
+
                     }
 
                     //hinge location
@@ -388,7 +398,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     this.shapes.ball.draw(graphics_state, foot_transform, this.fire);
 
                     let shoe_transform = orig;
-                    if (scene <= 3) {
+                    if (scene <= 1) {
                         shoe_transform = shoe_transform.times(Mat4.translation(Vec.of(i, -this.body_height - 4.5*this.leg_height, 2*this.body_length)));
                     }
                     else {
@@ -491,7 +501,6 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
             }
             scene3(graphics_state, body_transform){
                 this.t = this.t - this.time_offset;
-
                 body_transform = this.body_transform_curr;
                 var board_transform = this.board_transform_curr;
                 var butterfly_transform = this.butterfly_transform_curr;
@@ -511,11 +520,9 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 board_transform = board_transform.times(Mat4.translation([0, 10*Math.abs(Math.sin(this.t)), 0]))
                 this.draw_skateboard(graphics_state, board_transform);
 
-                var branch_transform = this.branch_transform;
                 this.draw_branch(graphics_state, branch_transform);
 
-                var butterfly_transform = this.butterfly_transform;
-                butterfly_transform = butterfly_transform.times(Mat4.translation([this.cliff_width+7*this.butterfly_body_width, -1.5*this.cliff_height, -10]))
+                butterfly_transform = butterfly_transform.times(Mat4.translation([this.cliff_width+8*this.butterfly_body_width, -1.55*this.cliff_height, -10]))
                 this.draw_butterfly(graphics_state, butterfly_transform);
 
                 this.body_transform_next = body_transform;
@@ -534,7 +541,6 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
                 body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, -1, -1)));
                 body_transform = body_transform.times(Mat4.rotation(Math.PI/2, Vec.of(0, 1, 0)));
-                // body_transform = body_transform.times(Mat4.translation([0, 0, 3*this.t]));
 
                 this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
                 this.draw_head(graphics_state, body_transform, 4);
@@ -545,12 +551,10 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 board_transform = board_transform.times(Mat4.translation([0, 10*Math.abs(Math.sin(this.t)), 0]))
                 this.draw_skateboard(graphics_state, board_transform, 4);
 
-                branch_transform = this.branch_transform;
                 this.draw_branch(graphics_state, branch_transform, 4);
 
                 butterfly_transform = this.butterfly_transform;
-                butterfly_transform = butterfly_transform.times(Mat4.translation([this.cliff_width+7*this.butterfly_body_width, -1.5*this.cliff_height, -10]))
-                // butterfly_transform = butterfly_transform.times(Mat4.translation([3*this.t, 0, 0]));
+                butterfly_transform = butterfly_transform.times(Mat4.translation([this.cliff_width+8*this.butterfly_body_width, -1.55*this.cliff_height, -10]))
                 this.draw_butterfly(graphics_state, butterfly_transform, 4);
 
                 this.body_transform_curr = body_transform;
@@ -567,7 +571,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
                 this.draw_cliff(graphics_state, this.cliff_transform, 5);
 
-                body_transform = body_transform.times(Mat4.translation([0, 0, 3*this.t]));
+                body_transform = body_transform.times(Mat4.translation([0, 3*Math.sin(3*this.t), 3*this.t]));
                 this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
                 this.draw_head(graphics_state, body_transform, 5);
                 this.draw_arms(graphics_state, body_transform, 5);
@@ -580,7 +584,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 branch_transform = this.branch_transform;
                 this.draw_branch(graphics_state, branch_transform, 5);
 
-                butterfly_transform = butterfly_transform.times(Mat4.translation([3*this.t, 0, 0]));
+                butterfly_transform = butterfly_transform.times(Mat4.translation([3*this.t, 3*Math.sin(3*this.t), 0]));
                 this.draw_butterfly(graphics_state, butterfly_transform, 5);
 
                 this.body_transform_next = body_transform;
@@ -605,28 +609,33 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     let timeScene2 = 12;
                     let timeScene3 = 20;
                     let timeScene4 = 26.6;
-                    let timeScene5 = 28;
+                    let timeScene5 = 31.6;
 
                     if (this.t > 0 && this.t <= timeScene2) {
+                        console.log(1);
                         //skateboarding
                         this.scene1(graphics_state, body_transform);
                     }
                     else if (this.t > timeScene2 && this.t <= timeScene3) {
+                        console.log(2);
                         //animate curve of fall, fall, branch appears
                         this.time_offset = timeScene2;
                         this.scene2(graphics_state, body_transform);
                     }
                     else if (this.t > timeScene3 && this.t <= timeScene4) {
+                        console.log(3);
                         //skateboard bounces on branch, butterfly appears
                         this.time_offset =  timeScene3;
                         this.scene3(graphics_state, body_transform);
                     }
                     else if (this.t > timeScene4 && this.t <= timeScene5) {
+                        console.log(4);
                         //person sits on butterfly and butterfly moves?
                         this.time_offset = timeScene4;
                         this.scene4(graphics_state, body_transform);
                     }
                     else if (this.t > timeScene5) {
+                        console.log(5);
                         //person and butterfly move
                         this.time_offset = timeScene5;
                         this.scene5(graphics_state, body_transform);
