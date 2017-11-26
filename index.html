@@ -3,6 +3,8 @@
     <script type="text/javascript" src="tinywebgl-ucla.js" ></script>  <!--  Javascript "include" files.  Any code in them gets executed as part of the page loading. //-->
     <script type="text/javascript" src="dependencies.js"   ></script>
     <script type="text/javascript"> "use strict"
+    var                    numToColor = {};
+
     window.onload = function init()        // ********************* THE ENTRY POINT OF THE WHOLE PROGRAM STARTS HERE *********************
     { window.contexts = {};                                                            // A global variable, "contexts".  Browsers support up to 16 WebGL contexts per page.
 
@@ -180,7 +182,14 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     stars        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,1,1 ), .5, .5, .5, 40, context.get_instance( "assets/stars.png" ) ),
                     rgb        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,1,1 ), .5, .5, .5, 40, context.get_instance( "assets/rgb.jpg" ) ) } );
 
+                    numToColor[0] = this.yellow;
+                    numToColor[1] = this.brown;
+                    numToColor[2] = this.red;
+                    numToColor[3] = this.green;
+                    numToColor[4] = this.blue;
+                    numToColor[5] = this.silver;
                 }
+
                 ////////////////////////////////////////////////////////////////////////////
                 ////////////////////////////////////// CUSTOM SHAPE //////////////////////////////////////
                 ////////////////////////////////////////////////////////////////////////////
@@ -460,14 +469,13 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     }
                 }
                 draw_portal(graphics_state, portal_transform, scene) {
-
                     if (scene == 5){
                         portal_transform = portal_transform.times(Mat4.rotation(Math.PI/4, Vec.of(0,-1,0)));
                         this.shapes.capped.draw(graphics_state, portal_transform.times(Mat4.scale([this.portal_width, this.portal_height, this.portal_length])), this.fire);
                     }
                     else {
-                        let cave_width = 200;
-                        let cave_height = 200;
+                        let cave_width = 300;
+                        let cave_height = 300;
                         let cave_length = 0;
                         portal_transform = portal_transform.times(Mat4.rotation(Math.PI/4, Vec.of(0,1,0)));
                         this.shapes.capped.draw(graphics_state, portal_transform.times(Mat4.scale([2*this.portal_width, this.portal_height, 2*this.portal_length])), this.fire);
@@ -477,9 +485,17 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                         this.shapes.strip.draw(graphics_state, cave_transform.times(Mat4.scale([cave_width, cave_height, cave_length])), this.rgb);
                         var gem_transform = cave_transform;
 
-                        cave_transform = cave_transform.times(Mat4.translation([cave_width/2, cave_height/2, cave_length]));
+                        var orig = gem_transform;
+                        for (let i of [-3.5, -1.5, 1.5, 4]){
+                            for (let j of [-5, -2, 1.5, 2, 3.5]) {
+                                var numColor = Math.floor((Math.random() * 6));
+                                gem_transform = gem_transform.times(Mat4.translation([cave_width/i, cave_height/j, cave_length]));
+                                console.log(this.numToColor);
+                                this.shapes.gem.draw(graphics_state, gem_transform.times(Mat4.scale([10,10,10])), numToColor[numColor]);
+                                gem_transform = orig;
+                            }
+                        }
 
-                        this.shapes.gem.draw(graphics_state, cave_transform.times(Mat4.scale([10,10,10])), this.red);
                     }
                 }
                 scene1(graphics_state, body_transform) {
