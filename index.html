@@ -139,8 +139,8 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 this.cliff_length = 40;
 
                 this.portal_width = 40;
-                this.portal_height = 70;
-                this.portal_length = 2;
+                this.portal_height = 60;
+                this.portal_length = 7;
 
                 this.cliff_transform = Mat4.identity();
                 this.body_transform = Mat4.identity();
@@ -471,6 +471,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     }
                 }
                 draw_portal(graphics_state, portal_transform, scene) {
+                    portal_transform = portal_transform.times(Mat4.rotation(Math.PI/4, Vec.of(0,-1,0)));
                     this.shapes.capped.draw(graphics_state, portal_transform.times(Mat4.scale([this.portal_width, this.portal_height, this.portal_length])), this.fire);
                 }
                 scene1(graphics_state, body_transform) {
@@ -603,7 +604,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
                     this.draw_cliff(graphics_state, this.cliff_transform, 5);
 
-                    body_transform = body_transform.times(Mat4.translation([0, 3*Math.sin(3*this.t), 3*this.t]));
+                    body_transform = body_transform.times(Mat4.translation([0, 3*Math.sin(3*this.t), 10*this.t]));
                     this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
                     // this.shapes.ghost.draw(graphics_state, body_transform.times(Mat4.scale(Vec.of(10,10,10))), this.purplePlastic);
                     this.draw_head(graphics_state, body_transform, 5);
@@ -617,7 +618,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     branch_transform = this.branch_transform;
                     this.draw_branch(graphics_state, branch_transform, 5);
 
-                    butterfly_transform = butterfly_transform.times(Mat4.translation([3*this.t, 3*Math.sin(3*this.t), 0]));
+                    butterfly_transform = butterfly_transform.times(Mat4.translation([10*this.t, 3*Math.sin(3*this.t), 0]));
                     this.draw_butterfly(graphics_state, butterfly_transform, 5);
 
                     portal_transform = portal_transform.times(Mat4.translation([3*this.cliff_width+8*this.butterfly_body_width, -1.55*this.cliff_height, -10]))
@@ -627,6 +628,9 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     this.board_transform_next = board_transform;
                     this.butterfly_transform_next = butterfly_transform;
                     this.branch_transform_next = branch_transform;
+                }
+                scene6(graphics_state, body_transform) {
+
                 }
                 display( graphics_state )
                 {
@@ -646,6 +650,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                         let timeScene3 = 20;
                         let timeScene4 = 26.6;
                         let timeScene5 = 28;
+                        let timeScene6 = 37;
 
                         if (this.t > 0 && this.t <= timeScene2) {
                             console.log(1);
