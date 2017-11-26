@@ -504,7 +504,14 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     }
                 }
                 draw_genie(graphics_state, genie_transform, scene){
-
+                    let genie_parts_offset = -30;
+                    genie_transform = genie_transform.times(Mat4.translation([0, Math.sin(this.t),0]))
+                    this.shapes.box.draw(graphics_state, genie_transform.times(Mat4.scale([10,10,10])), this.red);
+                    genie_transform = genie_transform.times(Mat4.translation([0,genie_parts_offset,0]));
+                    this.shapes.septagon.draw(graphics_state, genie_transform.times(Mat4.scale([20,20,20])), this.red);
+                    genie_transform = genie_transform.times(Mat4.translation([0,genie_parts_offset,0]));
+                    genie_transform = genie_transform.times(Mat4.rotation(Math.PI/4, Vec.of(0,1,0)));
+                    this.shapes.swept_curve.draw(graphics_state, genie_transform.times(Mat4.scale([10,10,10])), this.red);
                 }
                 scene1(graphics_state, body_transform) {
                     //camera, looking at, up
@@ -665,6 +672,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     body_transform = this.body_transform_next;
                     var butterfly_transform = this.butterfly_transform_next;
                     var portal_transform = this.portal_transform_next;
+                    var genie_transform = this.genie_transform_next;
 
                     body_transform = body_transform.times(Mat4.translation([0, 3*Math.sin(3*this.t), 10*this.t]));
                     this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
@@ -677,9 +685,14 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
                     this.draw_portal(graphics_state, portal_transform, 6);
 
+                    genie_transform = genie_transform.times(Mat4.translation([6*this.cliff_width+8*this.butterfly_body_width, -1.55*this.cliff_height, 0]))
+                    // genie_transform = genie_transform.times(Mat4.rotation(Math.PI/2, Vec.of(1,0,0)));
+                    this.draw_genie(graphics_state, genie_transform, 6);
+
                     this.body_transform_curr = body_transform;
                     this.butterfly_transform_curr = butterfly_transform;
                     this.portal_transform_curr = portal_transform;
+                    this.genie_transform_curr = genie_transform;
                 }
 
                 display( graphics_state )
