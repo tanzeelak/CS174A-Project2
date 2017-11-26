@@ -685,7 +685,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
                     this.draw_portal(graphics_state, portal_transform, 6);
 
-                    genie_transform = genie_transform.times(Mat4.translation([8*this.cliff_width+8*this.butterfly_body_width, -1*this.cliff_height, 30]));
+                    genie_transform = genie_transform.times(Mat4.translation([8*this.cliff_width+8*this.butterfly_body_width, -1*this.cliff_height, 0]));
                     // genie_transform = genie_transform.times(Mat4.rotation(Math.PI/2, Vec.of(1,0,0)));
                     this.draw_genie(graphics_state, genie_transform, 6);
 
@@ -694,7 +694,29 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     this.portal_transform_curr = portal_transform;
                     this.genie_transform_curr = genie_transform;
                 }
+                scene7(graphics_state, body_transform) {
+                    this.t = this.t - this.time_offset;
+                    body_transform = this.body_transform_curr;
+                    var butterfly_transform = this.butterfly_transform_curr;
+                    var portal_transform = this.portal_transform_curr;
+                    var genie_transform = this.genie_transform_curr;
 
+                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
+                    this.draw_head(graphics_state, body_transform, 7);
+                    this.draw_arms(graphics_state, body_transform, 7);
+                    this.draw_legs(graphics_state, body_transform, 7);
+
+                    this.draw_butterfly(graphics_state, butterfly_transform, 7);
+
+                    this.draw_portal(graphics_state, portal_transform, 7);
+
+                    this.draw_genie(graphics_state, genie_transform, 7);
+
+                    this.body_transform_next = body_transform;
+                    this.butterfly_transform_next = butterfly_transform;
+                    this.portal_transform_next = portal_transform;
+                    this.genie_transform_next = genie_transform;
+                }
                 display( graphics_state )
                 {
                     this.t = graphics_state.animation_time/1000;
@@ -715,6 +737,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                         let timeScene5 = 28;
                         let timeScene6 = 37;
                         let timeScene7 = 47;
+                        let timeScene8 = 52;
 
                         if (this.t > 0 && this.t <= timeScene2) {
                             console.log(1);
@@ -745,12 +768,19 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                             this.time_offset = timeScene5;
                             this.scene5(graphics_state, body_transform);
                         }
-                        else if (this.t > timeScene6) {
+                        else if (this.t > timeScene6 && this.t <= timeScene7) {
                             console.log(6);
                             //portal changes to cave and genie appears
                             this.time_offset = timeScene6;
                             this.scene6(graphics_state, body_transform);
                         }
+                        else if (this.t > timeScene7) {
+                            console.log(7);
+                            //he speaks to genie as text appears, currently everything will stay still
+                            this.time_offset = timeScene7;
+                            this.scene7(graphics_state, body_transform);
+                        }
+
 
 
                         //   model_transform.post_multiply( Mat4.translation([ 0, -2, 0 ]) );
