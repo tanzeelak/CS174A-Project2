@@ -78,6 +78,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     'strip'             : new Square(),                              // each with only one instance in the graphics card's memory.
                     'bad_tetrahedron'   : new Tetrahedron( false ),                  // For example we would only create one "cube" blueprint in the GPU, but then
                     'tetrahedron'       : new Tetrahedron( true ),                   // re-use it many times per call to display to get multiple cubes in the scene.
+                    'myshape'           : new MyShape( false ),
                     'windmill'          : new Windmill( 10 ),
                     'box'               : new Cube(),
                     'ball'              : new Subdivision_Sphere(4),
@@ -151,6 +152,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 this.branch_transform = Mat4.identity();
                 this.butterfly_transform = Mat4.identity();
                 this.portal_transform = Mat4.identity();
+                this.genie_transform = Mat4.identity();
 
                 this.body_transform_next = Mat4.identity();
                 this.body_transform_curr = Mat4.identity();
@@ -162,6 +164,8 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 this.branch_transform_next = Mat4.identity();
                 this.portal_transform_curr = Mat4.identity();
                 this.portal_transform_next = Mat4.identity();
+                this.genie_transform_curr = Mat4.identity();
+                this.genie_transform_next = Mat4.identity();
 
                 // Place the camera, which is stored in a scratchpad for globals.  Secondly, setup the projection:  The matrix that determines how depth is treated.  It projects 3D points onto a plane.
                 Object.assign( context.globals.graphics_state, { camera_transform: Mat4.translation([ 0, 0,-25 ]), projection_transform: Mat4.perspective( Math.PI/4, context.width/context.height, .1, 1000 ) } );
@@ -488,15 +492,19 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                         var orig = gem_transform;
                         for (let i of [-3.5, -1.5, 1.5, 4]){
                             for (let j of [-5, -2, 1.5, 2, 3.5]) {
-                                var numColor = Math.floor((Math.random() * 6));
+                                //UNCOMMENT
+                                // var numColor = Math.floor((Math.random() * 6));
                                 gem_transform = gem_transform.times(Mat4.translation([cave_width/i, cave_height/j, cave_length]));
-                                console.log(this.numToColor);
-                                this.shapes.gem.draw(graphics_state, gem_transform.times(Mat4.scale([10,10,10])), numToColor[numColor]);
+                                // this.shapes.gem.draw(graphics_state, gem_transform.times(Mat4.scale([10,10,10])), numToColor[numColor]);
+                                this.shapes.myshape.draw(graphics_state, gem_transform.times(Mat4.scale([10,10,10])), this.red);
                                 gem_transform = orig;
                             }
                         }
 
                     }
+                }
+                draw_genie(graphics_state, genie_transform, scene){
+
                 }
                 scene1(graphics_state, body_transform) {
                     //camera, looking at, up
@@ -725,7 +733,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                         }
                         else if (this.t > timeScene6) {
                             console.log(6);
-                            //person and butterfly move and create portal
+                            //portal changes to cave and genie appears
                             this.time_offset = timeScene6;
                             this.scene6(graphics_state, body_transform);
                         }
