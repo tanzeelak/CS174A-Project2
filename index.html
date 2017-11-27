@@ -1,5 +1,6 @@
 <!-- Graphics Example Code.  index.html - The web page document containing the canvas (drawing surface), that launches your javascript files.  By Garett //-->
 <!DOCTYPE html> <html> <head> <meta charset="UTF-8"/> <link rel="icon" href="assets/fav.ico">
+    <link rel="stylesheet" type="text/css" href="style.css">
     <script type="text/javascript" src="tinywebgl-ucla.js" ></script>  <!--  Javascript "include" files.  Any code in them gets executed as part of the page loading. //-->
     <script type="text/javascript" src="dependencies.js"   ></script>
     <script type="text/javascript"> "use strict"
@@ -104,7 +105,6 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 };
                 this.submit_shapes( context, shapes );
 
-
                 //BUTTER FLY
                 this.butterfly_body_length = 4;
                 this.butterfly_body_height = 1;
@@ -166,6 +166,8 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 this.portal_transform_next = Mat4.identity();
                 this.genie_transform_curr = Mat4.identity();
                 this.genie_transform_next = Mat4.identity();
+                this.spaceship_transform_curr = Mat4.identity();
+                this.spaceship_transform_next = Mat4.identity();
 
                 // Place the camera, which is stored in a scratchpad for globals.  Secondly, setup the projection:  The matrix that determines how depth is treated.  It projects 3D points onto a plane.
                 Object.assign( context.globals.graphics_state, { camera_transform: Mat4.translation([ 0, 0,-25 ]), projection_transform: Mat4.perspective( Math.PI/4, context.width/context.height, .1, 1000 ) } );
@@ -516,12 +518,20 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     genie_transform = genie_transform.times(Mat4.rotation(Math.PI/4, Vec.of(0,1,0)));
                     this.shapes.swept_curve.draw(graphics_state, genie_transform.times(Mat4.scale([20,20,20])), this.red);
                 }
-                draw_spaceship(graphics_state, spaceship_tranform, scene) {
-                    
+                draw_spaceship(graphics_state, spaceship_transform, scene) {
+                    let cone_height = 90;
+                    let cone_width = 30;
+                    let ball_height = 12;
+                    let donut_width = 20;
+                    this.shapes.ball.draw(graphics_state, spaceship_transform.times(Mat4.scale(Vec.of(12, 12, 12))), this.fire);
+                    spaceship_transform = spaceship_transform.times(Mat4.translation([0, 0, -ball_height]));
+                    this.shapes.donut.draw(graphics_state, spaceship_transform.times(Mat4.scale(Vec.of(donut_width, donut_width, donut_width))), this.silver);
+                    spaceship_transform = spaceship_transform.times(Mat4.translation([0, 0, -cone_height]));
+                    this.shapes.open_cone.draw(graphics_state, spaceship_transform.times(Mat4.scale(Vec.of(cone_width, cone_width, cone_height))), this.greenGrass);
                 }
                 scene1(graphics_state, body_transform) {
                     //camera, looking at, up
-                    // graphics_state.camera_transform = Mat4.look_at( Vec.of( -20,0, 80), Vec.of( 0,0,0 ), Vec.of( 0,1,0 ) );
+                    // graphics_state.camera_transform = Mat4.look_at( Vec.of( 20,0, 80), Vec.of( 4*this.t,0,0 ), Vec.of( 0,1,0 ) );
                     this.draw_cliff(graphics_state, this.cliff_transform, 1);
 
                     body_transform = body_transform.times(Mat4.translation([4*this.t, 0, 0]));
@@ -729,6 +739,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var butterfly_transform = this.butterfly_transform_next;
                     var portal_transform = this.portal_transform_next;
                     var genie_transform = this.genie_transform_next;
+                    var spaceship_transform = this.spaceship_transform_next;
 
                     this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
                     this.draw_head(graphics_state, body_transform, 8);
@@ -741,10 +752,14 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
                     this.draw_genie(graphics_state, genie_transform, 8);
 
+                    spaceship_transform = spaceship_transform.times(Mat4.translation([5.75*this.cliff_width+8*this.butterfly_body_width, 80, 0]));
+                    this.draw_spaceship(graphics_state, spaceship_transform.times(Mat4.rotation(Math.PI/2, Vec.of(-1,0,0))), 8);
+
                     this.body_transform_curr = body_transform;
                     this.butterfly_transform_curr = butterfly_transform;
                     this.portal_transform_curr = portal_transform;
                     this.genie_transform_curr = genie_transform;
+                    this.spaceship_transform_curr = spaceship_transform;
                 }
                 display( graphics_state ){
                     this.t = graphics_state.animation_time/1000;
@@ -766,6 +781,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                         let timeScene6 = 37;
                         let timeScene7 = 47;
                         let timeScene8 = 52;
+                        let timeScene9 = 54;
 
                         if (this.t > 0 && this.t <= timeScene2) {
                             console.log(1);
@@ -856,6 +872,14 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 </style>
             </head><body>
                 <div id="explanation_section"></div>
+                <!-- <div class="wrapper">
+                    <div class="score">0</div>
+                    <div class="game-over">
+                        <h4>GAME OVER</h4>
+                        <h2 class="high-score">30</h2>
+                        <div class="reset">Play Again</div>
+                    </div>
+                </div> -->
                 <div id="canvases"></div>
                 <table id="control_buttons" class="dropdown" style="display:block; width: 70%;  border: 0px; margin: 0 0 50px 0"><tr></tr></table>
                 <div id="code_panel" style="font-family: monospace; white-space: pre; margin: 50px 0" >
