@@ -72,16 +72,18 @@ class MyShape extends Shape            // A demo of flat vs smooth shading (a bo
       { this.positions     .push( ...Vec.cast( [0,0,0], [1,0,0], [0,1,0],         // Method 2:  A tetrahedron with
                                                [0,0,0], [1,0,0], [0,0,1],         // four independent triangles.
                                                [0,0,0], [0,1,0], [0,0,1],
+                                               [0,0,1], [1,0,0], [0,1,0],
                                                [0,0,1], [1,0,0], [0,1,0] ) );
 
         this.normals       .push( ...Vec.cast( [0,0,-1], [0,0,-1], [0,0,-1],        // This here makes Method 2 flat shaded, since values of
                                                [0,-1,0], [0,-1,0], [0,-1,0],        // normal vectors can be constant per whole triangle.
                                                [-1,0,0], [-1,0,0], [-1,0,0],        // Repeat them for all three vertices.
-                                               [ a,a,a], [ a,a,a], [ a,a,a] ) );
+                                               [0,0,1], [1,0,0], [0,1,0], ) );
 
         this.texture_coords.push( ...Vec.cast( [0,0], [1,0], [1,0],      // Each face in Method 2 also gets its own set of texture coords
                                                [0,0], [1,0], [1,0],      //(half the image is mapped onto each face).  We couldn't do this
                                                [0,0], [1,0], [1,0],      // with shared vertices since this features abrupt transitions
+                                               [0,0], [1,0], [1,0],
                                                [0,0], [1,0], [1,0] ) );  // when approaching the same point from different directions.
 
         this.indices.push( 0, 1, 2,    3, 4, 5,    6, 7, 8,    9, 10, 11 );      // Notice all vertices are unique this time.

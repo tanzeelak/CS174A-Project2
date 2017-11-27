@@ -542,7 +542,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                                 // var numColor = Math.floor((Math.random() * 6));
                                 gem_transform = gem_transform.times(Mat4.translation([cave_width/i, cave_height/j, cave_length]));
                                 // this.shapes.gem.draw(graphics_state, gem_transform.times(Mat4.scale([10,10,10])), numToColor[numColor]);
-                                this.shapes.myshape.draw(graphics_state, gem_transform.times(Mat4.scale([10,10,10])), this.red);
+                                this.shapes.myshape.draw(graphics_state, gem_transform.times(Mat4.scale([20,20,20])), this.red);
                                 gem_transform = orig;
                             }
                         }
@@ -567,10 +567,10 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     spaceship_transform = spaceship_transform.times(Mat4.translation([0, 0, -ball_height]));
                     this.shapes.donut.draw(graphics_state, spaceship_transform.times(Mat4.scale(Vec.of(donut_width, donut_width, donut_width))), this.silver);
                     spaceship_transform = spaceship_transform.times(Mat4.translation([0, 0, -cone_height]));
-                    this.shapes.open_cone.draw(graphics_state, spaceship_transform.times(Mat4.scale(Vec.of(cone_width, cone_width, cone_height))), this.green);
+                    this.shapes.open_cone.draw(graphics_state, spaceship_transform.times(Mat4.scale(Vec.of(cone_width, cone_width, cone_height))), this.blueGlass);
                 }
                 draw_portal_text(graphics_state, body_transform, scene) {
-                    body_transform = body_transform.times(Mat4.translation([-10, -30, 20]));
+                    body_transform = body_transform.times(Mat4.translation([0, -30, 10]));
                     let strings = [ "Genie: What do you wish for?", "Person: A new adventure.", "This is a line.\n\n\n"+"This is another line.", Text_Line.toString(), Text_Line.toString() ];
                     if (this.t <= 3 && this.t > 0){
                         this.shapes.text.set_string( strings[0] );
@@ -583,7 +583,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 }
                 scene1(graphics_state, body_transform) {
                     //camera, looking at, up
-                    //graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0,80), Vec.of( 4*this.t,0,0 ), Vec.of( 0,1,0 ) );
+                    graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0,80), Vec.of( 4*this.t,0,0 ), Vec.of( 0,1,0 ) );
                     this.draw_sky(graphics_state, this.sky_transform, 1);
                     this.draw_cliff(graphics_state, this.cliff_transform, 1);
 
@@ -616,7 +616,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var bodyX = this.bodyX_next+offsetX;
                     var bodyY = this.bodyY_next+offsetY;
                     var bodyZ = this.bodyZ_next+offsetZ;
-                    //graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
+                    graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
 
                     this.draw_sky(graphics_state, this.sky_transform, 1);
 
@@ -671,7 +671,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var bodyX = this.bodyX_curr + offsetX;
                     var bodyY = this.bodyY_curr + offsetY;
                     var bodyZ = this.bodyZ_curr + offsetZ;
-                    //graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
+                    graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
 
                     this.draw_sky(graphics_state, this.sky_transform, 1);
 
@@ -715,7 +715,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var bodyX = this.bodyX_next + offsetX;
                     var bodyY = this.bodyY_next + offsetY;
                     var bodyZ = this.bodyZ_next + offsetZ;
-                    //graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
+                    graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
 
                     this.draw_sky(graphics_state, this.sky_transform, 1);
 
@@ -760,7 +760,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var bodyX = this.bodyX_curr;
                     var bodyY = this.bodyY_curr+offsetY;
                     var bodyZ = this.bodyZ_curr-offsetZ;
-                    //graphics_state.camera_transform = Mat4.look_at( Vec.of(90,0+bodyY, 200+bodyZ+offsetZ), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
+                    graphics_state.camera_transform = Mat4.look_at( Vec.of(90,0+bodyY, 200+bodyZ+offsetZ), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
 
                     this.draw_sky(graphics_state, this.sky_transform, 1);
 
@@ -806,7 +806,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var bodyX = this.bodyX_next+10*this.t;
                     var bodyY = this.bodyY_next+offsetY;
                     var bodyZ = this.bodyZ_next-offsetZ;
-                    //graphics_state.camera_transform = Mat4.look_at( Vec.of(90+bodyX,bodyY,200+bodyZ+offsetZ), Vec.of( 2*bodyX,bodyY,bodyZ), Vec.of( 0,1,0 ) );
+                    graphics_state.camera_transform = Mat4.look_at( Vec.of(90+bodyX,bodyY,200+bodyZ+offsetZ), Vec.of( 2*bodyX,bodyY,bodyZ), Vec.of( 0,1,0 ) );
 
                     body_transform = body_transform.times(Mat4.translation([0, 3*Math.sin(3*this.t), 10*this.t]));
                     this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.maroon );
@@ -843,7 +843,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var bodyX = this.bodyX_curr;
                     var bodyY = this.bodyY_curr;
                     var bodyZ = this.bodyZ_curr;
-                    // graphics_state.camera_transform = Mat4.look_at( Vec.of(90+bodyX,bodyY,200+bodyZ), Vec.of( 2*bodyX,bodyY,bodyZ), Vec.of( 0,1,0 ) );
+                    graphics_state.camera_transform = Mat4.look_at( Vec.of(90+bodyX,bodyY,300+bodyZ), Vec.of( 2*bodyX,bodyY,bodyZ), Vec.of( 0,1,0 ) );
 
                     this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.maroon );
                     this.draw_head(graphics_state, body_transform, 7);
