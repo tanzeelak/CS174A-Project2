@@ -168,6 +168,12 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 this.genie_transform_next = Mat4.identity();
                 this.spaceship_transform_curr = Mat4.identity();
                 this.spaceship_transform_next = Mat4.identity();
+                this.bodyX_curr = 0;
+                this.bodyX_next = 0;
+                this.bodyY_curr = 0;
+                this.bodyY_next = 0;
+                this.bodyZ_curr = 0;
+                this.bodyZ_next = 0;
 
                 // Place the camera, which is stored in a scratchpad for globals.  Secondly, setup the projection:  The matrix that determines how depth is treated.  It projects 3D points onto a plane.
                 Object.assign( context.globals.graphics_state, { camera_transform: Mat4.translation([ 0, 0,-25 ]), projection_transform: Mat4.perspective( Math.PI/4, context.width/context.height, .1, 1000 ) } );
@@ -547,7 +553,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 }
                 scene1(graphics_state, body_transform) {
                     //camera, looking at, up
-                    // graphics_state.camera_transform = Mat4.look_at( Vec.of( 20,0, 80), Vec.of( 4*this.t,0,0 ), Vec.of( 0,1,0 ) );
+                    graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0,80), Vec.of( 4*this.t,0,0 ), Vec.of( 0,1,0 ) );
                     this.draw_cliff(graphics_state, this.cliff_transform, 1);
 
                     body_transform = body_transform.times(Mat4.translation([4*this.t, 0, 0]));
@@ -562,11 +568,18 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
                     this.body_transform_next = body_transform;
                     this.board_transform_next = board_transform;
+                    this.bodyX_next = 4*this.t;
+                    this.bodyY_next = 0;
+                    this.bodyZ_next = 0;
                 }
                 scene2(graphics_state, body_transform) {
                     this.t = this.t - this.time_offset;
                     body_transform = this.body_transform_next;
                     var board_transform = this.board_transform_next;
+                    var bodyX = this.bodyX_next;
+                    var bodyY = this.bodyY_next;
+                    var bodyZ = this.bodyZ_next;
+                    graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY-5*(this.t), bodyZ ), Vec.of( 0,1,0 ) );
 
                     this.draw_cliff(graphics_state, this.cliff_transform, 2);
 
@@ -600,13 +613,21 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     this.body_transform_curr = body_transform;
                     this.board_transform_curr = board_transform;
                     this.branch_transform_curr = branch_transform;
+                    this.bodyX_curr = bodyX;
+                    this.bodyY_curr = bodyY-5*(this.t);
+                    this.bodyZ_curr = bodyZ;
                 }
                 scene3(graphics_state, body_transform){
                     this.t = this.t - this.time_offset;
+
                     body_transform = this.body_transform_curr;
                     var board_transform = this.board_transform_curr;
                     var butterfly_transform = this.butterfly_transform_curr;
                     var branch_transform = this.branch_transform_curr;
+                    var bodyX = this.bodyX_curr;
+                    var bodyY = this.bodyY_curr;
+                    var bodyZ = this.bodyZ_curr;
+                    graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY-5*(this.t),bodyZ ), Vec.of( 0,1,0 ) );
 
                     this.draw_cliff(graphics_state, this.cliff_transform, 3);
                     body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, -1, -1)));
@@ -631,6 +652,9 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     this.board_transform_next = board_transform;
                     this.butterfly_transform_next = butterfly_transform;
                     this.branch_transform_next = branch_transform;
+                    this.bodyX_next = bodyX;
+                    this.bodyY_next = bodyY -5*this.t;
+                    this.bodyZ_next = bodyZ;
                 }
                 scene4(graphics_state, body_transform){
                     this.t = this.t - this.time_offset;
