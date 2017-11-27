@@ -194,7 +194,8 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     fire         : context.get_instance( Funny_Shader ).material(),
                     stars        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,1,1 ), .5, .5, .5, 40, context.get_instance( "assets/stars.png" ) ),
                     rgb        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,1,1 ), .5, .5, .5, 40, context.get_instance( "assets/rgb.jpg" ) ),
-                    greenGrass        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,0,1 ), .5, .5, .5, 40, context.get_instance( "assets/grass.jpg" ) )
+                    greenGrass        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,0,1 ), .5, .5, .5, 40, context.get_instance( "assets/grass.jpg" ) ),
+                    personFace        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,0,1 ), .5, .5, .5, 40, context.get_instance( "assets/personFace.jpg" ) ),
                 } );
                     numToColor[0] = this.yellow;
                     numToColor[1] = this.brown;
@@ -360,7 +361,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
                 draw_head (graphics_state, head_transform, scene) {
                     head_transform = head_transform.times( Mat4.translation([ 0, this.body_height+this.head_height, 0 ]) );
-                    this.shapes.box.draw(graphics_state, head_transform.times(Mat4.scale(Vec.of(this.head_width,this.head_height,this.head_length))), this.greyPlastic);
+                    this.shapes.box.draw(graphics_state, head_transform.times(Mat4.scale(Vec.of(this.head_width,this.head_height,this.head_length))), this.personFace);
                 }
                 draw_arms (graphics_state, arm_transform, scene) {
                     let hinge_width = this.arm_width;
@@ -572,7 +573,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 }
                 scene1(graphics_state, body_transform) {
                     //camera, looking at, up
-                    graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0,80), Vec.of( 4*this.t,0,0 ), Vec.of( 0,1,0 ) );
+                    //graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0,80), Vec.of( 4*this.t,0,0 ), Vec.of( 0,1,0 ) );
                     this.draw_cliff(graphics_state, this.cliff_transform, 1);
 
                     body_transform = body_transform.times(Mat4.translation([4*this.t, 0, 0]));
@@ -604,7 +605,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var bodyX = this.bodyX_next+offsetX;
                     var bodyY = this.bodyY_next+offsetY;
                     var bodyZ = this.bodyZ_next+offsetZ;
-                    graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
+                    //graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
 
                     this.draw_cliff(graphics_state, this.cliff_transform, 2);
 
@@ -657,7 +658,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var bodyX = this.bodyX_curr + offsetX;
                     var bodyY = this.bodyY_curr + offsetY;
                     var bodyZ = this.bodyZ_curr + offsetZ;
-                    graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
+                    //graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
 
                     this.draw_cliff(graphics_state, this.cliff_transform, 3);
                     body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, -1, -1)));
@@ -699,7 +700,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var bodyX = this.bodyX_next + offsetX;
                     var bodyY = this.bodyY_next + offsetY;
                     var bodyZ = this.bodyZ_next + offsetZ;
-                    graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
+                    //graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
 
                     this.draw_cliff(graphics_state, this.cliff_transform);
 
@@ -742,7 +743,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var bodyX = this.bodyX_curr;
                     var bodyY = this.bodyY_curr+offsetY;
                     var bodyZ = this.bodyZ_curr-offsetZ;
-                    graphics_state.camera_transform = Mat4.look_at( Vec.of(90,0+bodyY, 200+bodyZ+offsetZ), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
+                    //graphics_state.camera_transform = Mat4.look_at( Vec.of(90,0+bodyY, 200+bodyZ+offsetZ), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
 
                     this.draw_cliff(graphics_state, this.cliff_transform, 5);
 
@@ -786,7 +787,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var bodyX = this.bodyX_next+10*this.t;
                     var bodyY = this.bodyY_next+offsetY;
                     var bodyZ = this.bodyZ_next-offsetZ;
-                    graphics_state.camera_transform = Mat4.look_at( Vec.of(90+bodyX,bodyY,200+bodyZ+offsetZ), Vec.of( 2*bodyX,bodyY,bodyZ), Vec.of( 0,1,0 ) );
+                    //graphics_state.camera_transform = Mat4.look_at( Vec.of(90+bodyX,bodyY,200+bodyZ+offsetZ), Vec.of( 2*bodyX,bodyY,bodyZ), Vec.of( 0,1,0 ) );
 
                     body_transform = body_transform.times(Mat4.translation([0, 3*Math.sin(3*this.t), 10*this.t]));
                     this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );

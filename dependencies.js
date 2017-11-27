@@ -351,6 +351,7 @@ class Movement_Controls extends Scene_Component    // A Scene_Component that our
       this.key_triggered_button( "Roll left",  ",", function() { this.roll      =  1 }, undefined, function() { this.roll      = 0 } );
       this.key_triggered_button( "Roll right", ".", function() { this.roll      = -1 }, undefined, function() { this.roll      = 0 } ); this.new_line();
       this.key_triggered_button( "(Un)freeze look around",   "f",       function() { this.look_around_locked  ^=  1 },    "green" );    this.new_line();
+      this.live_string( () => { return "Frame Rate: "          + (globals.graphics_state.animation_delta_time/1000).toFixed(4)}); this.new_line();
       this.live_string( () => { return "Position: "            + this.   pos[0].toFixed(2) + ", " + this.   pos[1].toFixed(2) + ", " + this.   pos[2].toFixed(2) } ); this.new_line();
       this.live_string( () => { return "Center of rotation: "  + this.origin[0].toFixed(0) + ", " + this.origin[1].toFixed(0) + ", " + this.origin[2].toFixed(0) } ); this.new_line();
       this.live_string( () => { return "Facing: " + ( ( this.z_axis[0] > 0 ? "West " : "East ")             // (Actually affected by the left hand rule)
