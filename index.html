@@ -667,6 +667,14 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var board_transform = this.board_transform_next;
                     var butterfly_transform = this.butterfly_transform_next;
                     var branch_transform = this.branch_transform_next;
+                    //not necessary lol
+                    var offsetX = 0;
+                    var offsetY = 0;
+                    var offsetZ = 0;
+                    var bodyX = this.bodyX_next + offsetX;
+                    var bodyY = this.bodyY_next + offsetY;
+                    var bodyZ = this.bodyZ_next + offsetZ;
+                    graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
 
                     this.draw_cliff(graphics_state, this.cliff_transform);
 
@@ -692,6 +700,9 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     this.board_transform_curr = board_transform;
                     this.butterfly_transform_curr = butterfly_transform;
                     this.branch_transform_curr = branch_transform;
+                    this.bodyX_curr = bodyX;
+                    this.bodyY_curr = bodyY;
+                    this.bodyZ_curr = bodyZ;
                 }
                 scene5(graphics_state, body_transform){
                     this.t = this.t - this.time_offset;
@@ -700,6 +711,13 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var butterfly_transform = this.butterfly_transform_curr;
                     var branch_transform = this.branch_transform_curr;
                     var portal_transform = this.portal_transform_curr;
+                    var offsetX = 0;
+                    var offsetY = 3*Math.sin(3*this.t);
+                    var offsetZ = 10*this.t;
+                    var bodyX = this.bodyX_curr;
+                    var bodyY = this.bodyY_curr+offsetY;
+                    var bodyZ = this.bodyZ_curr-offsetZ;
+                    graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
 
                     this.draw_cliff(graphics_state, this.cliff_transform, 5);
 
