@@ -745,6 +745,9 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     this.butterfly_transform_next = butterfly_transform;
                     this.branch_transform_next = branch_transform;
                     this.portal_transform_next = portal_transform;
+                    this.bodyX_next = bodyX;
+                    this.bodyY_next = bodyY;
+                    this.bodyZ_next = bodyZ;
                 }
                 scene6(graphics_state, body_transform) {
                     this.t = this.t - this.time_offset;
@@ -779,6 +782,9 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     this.butterfly_transform_curr = butterfly_transform;
                     this.portal_transform_curr = portal_transform;
                     this.genie_transform_curr = genie_transform;
+                    this.bodyX_curr = 2*bodyX;
+                    this.bodyY_curr = bodyY;
+                    this.bodyZ_curr = bodyZ;
                 }
                 scene7(graphics_state, body_transform) {
                     this.t = this.t - this.time_offset;
@@ -786,6 +792,14 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var butterfly_transform = this.butterfly_transform_curr;
                     var portal_transform = this.portal_transform_curr;
                     var genie_transform = this.genie_transform_curr;
+                    var offsetX = 0;
+                    var offsetY = 0;
+                    var offsetZ = 0;
+                    var bodyX = this.bodyX_curr;
+                    var bodyY = this.bodyY_curr;
+                    var bodyZ = this.bodyZ_curr;
+                    graphics_state.camera_transform = Mat4.look_at( Vec.of(90+bodyX,bodyY,200+bodyZ), Vec.of( 0,0,0), Vec.of( 0,1,0 ) );
+
 
                     this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
                     this.draw_head(graphics_state, body_transform, 7);
