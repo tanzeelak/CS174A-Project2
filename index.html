@@ -155,6 +155,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 this.butterfly_transform = Mat4.identity();
                 this.portal_transform = Mat4.identity();
                 this.genie_transform = Mat4.identity();
+                this.sky_transform = Mat4.identity();
 
                 this.body_transform_next = Mat4.identity();
                 this.body_transform_curr = Mat4.identity();
@@ -189,13 +190,19 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     brown:  context.get_instance( Phong_Model ).material( Color.of( .3, .3, .1,  1 ), .2, 1,  1, 40 ),  // which returns a special-made "material"
                     red:    context.get_instance( Phong_Model ).material( Color.of(  1,  0,  0, .9 ), .1, .7, 1, 40 ),  // (a JavaScript object)
                     green:  context.get_instance( Phong_Model ).material( Color.of(  0, .5,  0,  1 ), .1, .7, 1, 40 ),
+                    wheelsGreen:  context.get_instance( Phong_Model ).material( Color.of(  126, 178,  44,  1 ), .1, .7, 1, 40 ),
                     blue:   context.get_instance( Phong_Model ).material( Color.of(  0,  0,  1, .8 ), .1, .7, 1, 40 ),
+                    pantsBlue:   context.get_instance( Phong_Model ).material( Color.of(  0,  .2,  1, 1 ), .1, .7, 1, 40 ),
+                    genieBlue:   context.get_instance( Phong_Model ).material( Color.of(  102,  207,  250, .8 ), .1, .7, 1, 40 ),
                     silver: context.get_instance( Phong_Model ).material( Color.of( .8, .8, .8,  1 ),  0,  1, 1, 40 ),
                     fire         : context.get_instance( Funny_Shader ).material(),
                     stars        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,1,1 ), .5, .5, .5, 40, context.get_instance( "assets/stars.png" ) ),
                     rgb        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,1,1 ), .5, .5, .5, 40, context.get_instance( "assets/rgb.jpg" ) ),
                     greenGrass        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,0,1 ), .5, .5, .5, 40, context.get_instance( "assets/grass.jpg" ) ),
-                    personFace        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,0,1 ), .5, .5, .5, 40, context.get_instance( "assets/personFace.jpg" ) ),
+                    personFace        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,0,1 ), 1, 1, 1, 40, context.get_instance( "assets/personFace.jpg" ) ),
+                    skateboard        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,0,1 ), 1, 1, 1, 40, context.get_instance( "assets/skateboard.jpg" ) ),
+                    sky        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,0,1 ), 1, 1, 1, 40, context.get_instance( "assets/sky.jpg" ) ),
+                    boxWorld        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,0,1 ), 1, 1, 1, 40, context.get_instance( "assets/boxWorld.jpg" ) ),
                 } );
                     numToColor[0] = this.yellow;
                     numToColor[1] = this.brown;
@@ -359,6 +366,13 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 ////////////////////////////////////// BUTTERFLY ENDS //////////////////////////////////////
                 ////////////////////////////////////////////////////////////////////////////
 
+                draw_sky(graphics_state, sky_transform, scene) {
+                    let sky_width = 250;
+                    let sky_height = 250;
+                    let sky_length = 250;
+                    sky_transform = sky_transform.times(Mat4.translation([0, 0, -50]))
+                    this.shapes.strip.draw(graphics_state, sky_transform.times(Mat4.scale([sky_width, sky_height, sky_length])), this.sky);
+                }
                 draw_head (graphics_state, head_transform, scene) {
                     head_transform = head_transform.times( Mat4.translation([ 0, this.body_height+this.head_height, 0 ]) );
                     this.shapes.box.draw(graphics_state, head_transform.times(Mat4.scale(Vec.of(this.head_width,this.head_height,this.head_length))), this.personFace);
@@ -367,7 +381,6 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     let hinge_width = this.arm_width;
                     let hinge_height = this.arm_height;
                     let hinge_length = 0;
-
 
                     var upper_arm_transform = arm_transform;
                     var orig = upper_arm_transform;
@@ -398,14 +411,14 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     // board_transform = board_transform.times(Mat4.translation(Vec.of(this.leg_width,-5*this.leg_height/4,0)));
 
                     board_transform = board_transform.times(Mat4.translation(Vec.of(0, -this.body_height - 4.5*this.leg_height - 1.75*this.shoe_height, 2*this.body_length)));
-                    this.shapes.box.draw(graphics_state, board_transform.times(Mat4.scale(Vec.of(this.board_width,this.board_height,this.board_length))), this.fire);
+                    this.shapes.box.draw(graphics_state, board_transform.times(Mat4.scale(Vec.of(this.board_width,this.board_height,this.board_length))), this.skateboard);
 
                     let wheel_transform = board_transform;
                     var orig = wheel_transform;
                     for (let i of [-1, 1]){
                         for (let j of [-1, 1]) {
-                            wheel_transform = wheel_transform.times(Mat4.translation([this.board_width*j, -2*this.shoe_height, this.board_length*i]));
-                            this.shapes.ball.draw(graphics_state, wheel_transform, this.blueGlass);
+                            wheel_transform = wheel_transform.times(Mat4.translation([3*this.board_width*j/4, -2*this.shoe_height, this.board_length*i/2]));
+                            this.shapes.ball.draw(graphics_state, wheel_transform, this.wheelsGreen);
                             wheel_transform = orig;
                         }
                     }
@@ -517,7 +530,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                             cave_transform = cave_transform.times(Mat4.translation([10*Math.sin(5*this.t), 0, 0]));
                         }
                         cave_transform = cave_transform.times(Mat4.translation([3*this.cliff_width+8*this.butterfly_body_width, -1.55*this.cliff_height, -50]))
-                        this.shapes.strip.draw(graphics_state, cave_transform.times(Mat4.scale([cave_width, cave_height, cave_length])), this.rgb);
+                        this.shapes.strip.draw(graphics_state, cave_transform.times(Mat4.scale([cave_width, cave_height, cave_length])), this.boxWorld);
 
                         var gem_transform = cave_transform;
                         var orig = gem_transform;
@@ -554,26 +567,10 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     spaceship_transform = spaceship_transform.times(Mat4.translation([0, 0, -cone_height]));
                     this.shapes.open_cone.draw(graphics_state, spaceship_transform.times(Mat4.scale(Vec.of(cone_width, cone_width, cone_height))), this.greenGrass);
                 }
-                getCameraZ() {
-                  // handle camera transitions
-                  if (!this.transition) {
-                    this.transition = new Transition(this.bodyZ, this.bodyZ, 1, this.t);
-                  }
-                  let cameraTransitionZ = this.transition.value(this.t);
-                  if (cameraTransitionZ != this.bodyZ && !this.transition.isTransitioning) {
-                    this.transition = new Transition(cameraTransitionZ, this.player.curZ, 250, this.t);
-                  }
-                  else if(cameraTransitionZ != this.bodyZ && this.transition.isTransitioning) {
-                    this.transition.updateEnd(this.bodyZ);
-                  }
-                  else if (cameraTransitionZ == this.bodyZ) {
-                    this.transition.isTransitioning = false;
-                  }
-                  return -this.transition.value(this.t) * 2;
-                }
                 scene1(graphics_state, body_transform) {
                     //camera, looking at, up
                     //graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0,80), Vec.of( 4*this.t,0,0 ), Vec.of( 0,1,0 ) );
+                    this.draw_sky(graphics_state, this.sky_transform, 1);
                     this.draw_cliff(graphics_state, this.cliff_transform, 1);
 
                     body_transform = body_transform.times(Mat4.translation([4*this.t, 0, 0]));
@@ -606,6 +603,8 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var bodyY = this.bodyY_next+offsetY;
                     var bodyZ = this.bodyZ_next+offsetZ;
                     //graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
+
+                    this.draw_sky(graphics_state, this.sky_transform, 1);
 
                     this.draw_cliff(graphics_state, this.cliff_transform, 2);
 
@@ -660,6 +659,8 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var bodyZ = this.bodyZ_curr + offsetZ;
                     //graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
 
+                    this.draw_sky(graphics_state, this.sky_transform, 1);
+
                     this.draw_cliff(graphics_state, this.cliff_transform, 3);
                     body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, -1, -1)));
                     body_transform = body_transform.times(Mat4.translation([offsetX, offsetY, offsetZ]));
@@ -701,6 +702,8 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var bodyY = this.bodyY_next + offsetY;
                     var bodyZ = this.bodyZ_next + offsetZ;
                     //graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
+
+                    this.draw_sky(graphics_state, this.sky_transform, 1);
 
                     this.draw_cliff(graphics_state, this.cliff_transform);
 
@@ -744,6 +747,8 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var bodyY = this.bodyY_curr+offsetY;
                     var bodyZ = this.bodyZ_curr-offsetZ;
                     //graphics_state.camera_transform = Mat4.look_at( Vec.of(90,0+bodyY, 200+bodyZ+offsetZ), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
+
+                    this.draw_sky(graphics_state, this.sky_transform, 1);
 
                     this.draw_cliff(graphics_state, this.cliff_transform, 5);
 
