@@ -844,6 +844,13 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
                     this.draw_genie(graphics_state, genie_transform, 7);
 
+                    
+                    let strings = [ "This is some text", "More text", "1234567890", "This is a line.\n\n\n"+"This is another line.", Text_Line.toString(), Text_Line.toString() ];
+                    for( let line of strings)
+                              { this.shapes.text.set_string( line );
+                                this.shapes.text.draw( graphics_state, genie_transform.times(Mat4.scale(Vec.of(30,30,30))), this.text_image );
+                              }
+
                     this.body_transform_next = body_transform;
                     this.butterfly_transform_next = butterfly_transform;
                     this.portal_transform_next = portal_transform;
