@@ -576,14 +576,17 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     this.t = this.t - this.time_offset;
                     body_transform = this.body_transform_next;
                     var board_transform = this.board_transform_next;
-                    var bodyX = this.bodyX_next;
-                    var bodyY = this.bodyY_next-5*this.t;
-                    var bodyZ = this.bodyZ_next;
+                    var offsetX = 0;
+                    var offsetY = -5*this.t;
+                    var offsetZ = 0;
+                    var bodyX = this.bodyX_next+offsetX;
+                    var bodyY = this.bodyY_next+offsetY;
+                    var bodyZ = this.bodyZ_next+offsetZ;
                     graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
 
                     this.draw_cliff(graphics_state, this.cliff_transform, 2);
 
-                    body_transform = body_transform.times(Mat4.translation([0, -5*(this.t), 0]));
+                    body_transform = body_transform.times(Mat4.translation([offsetX,offsetY,offsetZ]));
                     var angle = this.t/5;
                     if (angle < Math.PI/8) {
                         body_transform = body_transform.times(Mat4.rotation(angle, Vec.of(0, 1, 1)));
@@ -623,17 +626,17 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var board_transform = this.board_transform_curr;
                     var butterfly_transform = this.butterfly_transform_curr;
                     var branch_transform = this.branch_transform_curr;
-                    var x = 0;
-                    var y = -5*this.t;
-                    var z = 0;
-                    var bodyX = this.bodyX_curr + x;
-                    var bodyY = this.bodyY_curr + y;
-                    var bodyZ = this.bodyZ_curr + z;
+                    var offsetX = 0;
+                    var offsetY = -5*this.t;
+                    var offsetZ = 0;
+                    var bodyX = this.bodyX_curr + offsetX;
+                    var bodyY = this.bodyY_curr + offsetY;
+                    var bodyZ = this.bodyZ_curr + offsetZ;
                     graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
 
                     this.draw_cliff(graphics_state, this.cliff_transform, 3);
                     body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, -1, -1)));
-                    body_transform = body_transform.times(Mat4.translation([x, y, z]));
+                    body_transform = body_transform.times(Mat4.translation([offsetX, offsetY, offsetZ]));
                     body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, 1, 1)));
 
                     this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
