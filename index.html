@@ -551,6 +551,23 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     spaceship_transform = spaceship_transform.times(Mat4.translation([0, 0, -cone_height]));
                     this.shapes.open_cone.draw(graphics_state, spaceship_transform.times(Mat4.scale(Vec.of(cone_width, cone_width, cone_height))), this.greenGrass);
                 }
+                getCameraZ() {
+                  // handle camera transitions
+                  if (!this.transition) {
+                    this.transition = new Transition(this.bodyZ, this.bodyZ, 1, this.t);
+                  }
+                  let cameraTransitionZ = this.transition.value(this.t);
+                  if (cameraTransitionZ != this.bodyZ && !this.transition.isTransitioning) {
+                    this.transition = new Transition(cameraTransitionZ, this.player.curZ, 250, this.t);
+                  }
+                  else if(cameraTransitionZ != this.bodyZ && this.transition.isTransitioning) {
+                    this.transition.updateEnd(this.bodyZ);
+                  }
+                  else if (cameraTransitionZ == this.bodyZ) {
+                    this.transition.isTransitioning = false;
+                  }
+                  return -this.transition.value(this.t) * 2;
+                }
                 scene1(graphics_state, body_transform) {
                     //camera, looking at, up
                     graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0,80), Vec.of( 4*this.t,0,0 ), Vec.of( 0,1,0 ) );
@@ -571,6 +588,9 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     this.bodyX_next = 4*this.t;
                     this.bodyY_next = 0;
                     this.bodyZ_next = 0;
+                    this.bodyX = 4*this.t;
+                    this.bodyY = 0;
+                    this.bodyZ = 0;
                 }
                 scene2(graphics_state, body_transform) {
                     this.t = this.t - this.time_offset;
@@ -619,6 +639,9 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     this.bodyX_curr = bodyX;
                     this.bodyY_curr = bodyY;
                     this.bodyZ_curr = bodyZ;
+                    this.bodyX = bodyX;
+                    this.bodyY = bodyY;
+                    this.bodyZ = bodyZ;
                 }
                 scene3(graphics_state, body_transform){
                     this.t = this.t - this.time_offset;
@@ -782,7 +805,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     this.butterfly_transform_curr = butterfly_transform;
                     this.portal_transform_curr = portal_transform;
                     this.genie_transform_curr = genie_transform;
-                    this.bodyX_curr = 2*bodyX;
+                    this.bodyX_curr = bodyX;
                     this.bodyY_curr = bodyY;
                     this.bodyZ_curr = bodyZ;
                 }
@@ -798,8 +821,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var bodyX = this.bodyX_curr;
                     var bodyY = this.bodyY_curr;
                     var bodyZ = this.bodyZ_curr;
-                    graphics_state.camera_transform = Mat4.look_at( Vec.of(90+bodyX,bodyY,200+bodyZ), Vec.of( 0,0,0), Vec.of( 0,1,0 ) );
-
+                    // graphics_state.camera_transform = Mat4.look_at( Vec.of(90+bodyX,bodyY,200+bodyZ), Vec.of( 2*bodyX,bodyY,bodyZ), Vec.of( 0,1,0 ) );
 
                     this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
                     this.draw_head(graphics_state, body_transform, 7);
