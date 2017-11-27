@@ -753,13 +753,42 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     this.draw_genie(graphics_state, genie_transform, 8);
 
                     spaceship_transform = spaceship_transform.times(Mat4.translation([5.75*this.cliff_width+8*this.butterfly_body_width, 80, 0]));
-                    this.draw_spaceship(graphics_state, spaceship_transform.times(Mat4.rotation(Math.PI/2, Vec.of(-1,0,0))), 8);
+                    spaceship_transform = spaceship_transform.times(Mat4.rotation(Math.PI/2, Vec.of(-1,0,0)))
+                    this.draw_spaceship(graphics_state, spaceship_transform, 8);
 
                     this.body_transform_curr = body_transform;
                     this.butterfly_transform_curr = butterfly_transform;
                     this.portal_transform_curr = portal_transform;
                     this.genie_transform_curr = genie_transform;
                     this.spaceship_transform_curr = spaceship_transform;
+                }
+                scene9(graphics_state, body_transform){
+                    this.t = this.t - this.time_offset;
+                    body_transform = this.body_transform_curr;
+                    var butterfly_transform = this.butterfly_transform_curr;
+                    var portal_transform = this.portal_transform_curr;
+                    var genie_transform = this.genie_transform_curr;
+                    var spaceship_transform = this.spaceship_transform_curr;
+
+                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
+                    this.draw_head(graphics_state, body_transform, 8);
+                    this.draw_arms(graphics_state, body_transform, 8);
+                    this.draw_legs(graphics_state, body_transform, 8);
+
+                    this.draw_butterfly(graphics_state, butterfly_transform, 8);
+
+                    this.draw_portal(graphics_state, portal_transform, 8);
+
+                    this.draw_genie(graphics_state, genie_transform, 8);
+
+                    spaceship_transform = spaceship_transform.times(Mat4.translation([0, 0, -25*this.t]));
+                    this.draw_spaceship(graphics_state, spaceship_transform, 8);
+
+                    this.body_transform_next = body_transform;
+                    this.butterfly_transform_next = butterfly_transform;
+                    this.portal_transform_next = portal_transform;
+                    this.genie_transform_next = genie_transform;
+                    this.spaceship_transform_next = spaceship_transform;
                 }
                 display( graphics_state ){
                     this.t = graphics_state.animation_time/1000;
@@ -782,6 +811,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                         let timeScene7 = 47;
                         let timeScene8 = 52;
                         let timeScene9 = 54;
+                        let timeScene10 = 57;
 
                         if (this.t > 0 && this.t <= timeScene2) {
                             console.log(1);
@@ -824,13 +854,18 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                             this.time_offset = timeScene7;
                             this.scene7(graphics_state, body_transform);
                         }
-                        else if (this.t > timeScene8) {
+                        else if (this.t > timeScene8 && this.t <= timeScene9) {
                             console.log(8);
                             //background shakes and spaceship appears
                             this.time_offset = timeScene8;
                             this.scene8(graphics_state, body_transform);
                         }
-
+                        else if (this.t > timeScene9) {
+                            console.log(9);
+                            //spaceship moves down
+                            this.time_offset = timeScene9;
+                            this.scene9(graphics_state, body_transform);
+                        }
 
 
                         //   model_transform.post_multiply( Mat4.translation([ 0, -2, 0 ]) );
