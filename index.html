@@ -752,6 +752,13 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var butterfly_transform = this.butterfly_transform_next;
                     var portal_transform = this.portal_transform_next;
                     var genie_transform = this.genie_transform_next;
+                    var offsetX = 0;
+                    var offsetY = 3*Math.sin(3*this.t);
+                    var offsetZ = 10*this.t;
+                    var bodyX = this.bodyX_next+10*this.t;
+                    var bodyY = this.bodyY_next+offsetY;
+                    var bodyZ = this.bodyZ_next-offsetZ;
+                    graphics_state.camera_transform = Mat4.look_at( Vec.of(90+bodyX,bodyY,200+bodyZ+offsetZ), Vec.of( 2*bodyX,bodyY,bodyZ), Vec.of( 0,1,0 ) );
 
                     body_transform = body_transform.times(Mat4.translation([0, 3*Math.sin(3*this.t), 10*this.t]));
                     this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
