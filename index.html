@@ -366,9 +366,15 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                         //correct location
                         upper_arm_transform = upper_arm_transform.times(Mat4.translation([-1.25*this.body_length*i,this.body_height/3,0])); //transfer to hinge
 
+
                         //hinge location
                         upper_arm_transform = upper_arm_transform.times(Mat4.translation(Vec.of(hinge_width*i, hinge_height, hinge_length)));
+                        if (scene < 9){
                         upper_arm_transform = upper_arm_transform.times(Mat4.rotation(-1 + Math.PI/12*(Math.sin(this.globals.graphics_state.animation_time/100)), Vec.of(0,0,1*i)));
+                        }
+                        else {
+                            upper_arm_transform = upper_arm_transform.times(Mat4.rotation(-1 + Math.PI/12, Vec.of(0,0,1*i)));
+                        }
                         upper_arm_transform = upper_arm_transform.times(Mat4.translation(Vec.of(-hinge_width*i, -hinge_height, -hinge_length)));
 
                         //scaling
@@ -413,7 +419,12 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
                         //hinge location
                         upper_leg_transform = upper_leg_transform.times(Mat4.translation(Vec.of(hinge_width, hinge_height, hinge_length)));
-                        upper_leg_transform = upper_leg_transform.times(Mat4.rotation(-1 + Math.PI/24*(Math.sin(this.globals.graphics_state.animation_time/100)), Vec.of(1,0,0)));
+                        if (scene < 9){
+                            upper_leg_transform = upper_leg_transform.times(Mat4.rotation(-1 + Math.PI/24*(Math.sin(this.globals.graphics_state.animation_time/100)), Vec.of(1,0,0)));
+                        }
+                        else {
+                            upper_leg_transform = upper_leg_transform.times(Mat4.rotation(-1 + Math.PI/24, Vec.of(1,0,0)));
+                        }
                         upper_leg_transform = upper_leg_transform.times(Mat4.translation(Vec.of(-hinge_width, -hinge_height, -hinge_length)));
                         //scale
                         this.shapes.box.draw(graphics_state, upper_leg_transform.times(Mat4.scale(Vec.of(this.leg_width,this.leg_height,this.leg_length))), this.fire);
@@ -423,7 +434,12 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                         bottom_leg_transform = bottom_leg_transform.times(Mat4.translation(Vec.of(0,-2*this.leg_height,0)));
                         //hinge
                         bottom_leg_transform = bottom_leg_transform.times(Mat4.translation(Vec.of(hinge_width, hinge_height, -hinge_length)));
-                        bottom_leg_transform = bottom_leg_transform.times(Mat4.rotation(-(-1 + Math.PI/24*(Math.sin(this.globals.graphics_state.animation_time/100))), Vec.of(1,0,0)));
+                        if (scene < 9){
+                            bottom_leg_transform = bottom_leg_transform.times(Mat4.rotation(-(-1 + Math.PI/24*(Math.sin(this.globals.graphics_state.animation_time/100))), Vec.of(1,0,0)));
+                        }
+                        else {
+                            bottom_leg_transform = bottom_leg_transform.times(Mat4.rotation(-(-1 + Math.PI/24), Vec.of(1,0,0) ));
+                        }
                         bottom_leg_transform = bottom_leg_transform.times(Mat4.translation(Vec.of(-hinge_width, -(hinge_height), hinge_length)));
                         //scale
                         this.shapes.box.draw(graphics_state, bottom_leg_transform.times(Mat4.scale(Vec.of(this.leg_width,this.leg_height,this.leg_length))), this.fire);
@@ -771,24 +787,51 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var spaceship_transform = this.spaceship_transform_curr;
 
                     this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
-                    this.draw_head(graphics_state, body_transform, 8);
-                    this.draw_arms(graphics_state, body_transform, 8);
-                    this.draw_legs(graphics_state, body_transform, 8);
+                    this.draw_head(graphics_state, body_transform, 9);
+                    this.draw_arms(graphics_state, body_transform, 9);
+                    this.draw_legs(graphics_state, body_transform, 9);
 
-                    this.draw_butterfly(graphics_state, butterfly_transform, 8);
+                    this.draw_butterfly(graphics_state, butterfly_transform, 9);
 
-                    this.draw_portal(graphics_state, portal_transform, 8);
+                    this.draw_portal(graphics_state, portal_transform, 9);
 
-                    this.draw_genie(graphics_state, genie_transform, 8);
+                    this.draw_genie(graphics_state, genie_transform, 9);
 
                     spaceship_transform = spaceship_transform.times(Mat4.translation([0, 0, -25*this.t]));
-                    this.draw_spaceship(graphics_state, spaceship_transform, 8);
+                    this.draw_spaceship(graphics_state, spaceship_transform, 9);
 
                     this.body_transform_next = body_transform;
                     this.butterfly_transform_next = butterfly_transform;
                     this.portal_transform_next = portal_transform;
                     this.genie_transform_next = genie_transform;
                     this.spaceship_transform_next = spaceship_transform;
+                }
+                scene10(graphics_state, body_transform){
+                    this.t = this.t - this.time_offset;
+                    body_transform = this.body_transform_next;
+                    var butterfly_transform = this.butterfly_transform_next;
+                    var portal_transform = this.portal_transform_next;
+                    var spaceship_transform = this.spaceship_transform_next;
+
+                    body_transform = body_transform.times(Mat4.rotation(Math.PI/2, Vec.of(0, -1, 0)));
+                    body_transform = body_transform.times(Mat4.translation([0, this.t, 0]));
+                    body_transform = body_transform.times(Mat4.scale(Vec.of(this.t/10, this.t/10, this.t/10)));
+                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
+                    this.draw_head(graphics_state, body_transform, 10);
+                    this.draw_arms(graphics_state, body_transform, 10);
+                    this.draw_legs(graphics_state, body_transform, 10);
+
+                    butterfly_transform = butterfly_transform.times(Mat4.translation([10*this.t, 3*Math.sin(3*this.t), 0]));
+                    this.draw_butterfly(graphics_state, butterfly_transform, 10);
+
+                    this.draw_portal(graphics_state, portal_transform, 10);
+
+                    this.draw_spaceship(graphics_state, spaceship_transform, 10);
+
+                    this.body_transform_curr = body_transform;
+                    this.butterfly_transform_curr = butterfly_transform;
+                    this.portal_transform_curr = portal_transform;
+                    this.spaceship_transform_curr = spaceship_transform;
                 }
                 display( graphics_state ){
                     this.t = graphics_state.animation_time/1000;
@@ -811,7 +854,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                         let timeScene7 = 47;
                         let timeScene8 = 52;
                         let timeScene9 = 54;
-                        let timeScene10 = 57;
+                        let timeScene10 = 56;
 
                         if (this.t > 0 && this.t <= timeScene2) {
                             console.log(1);
@@ -832,7 +875,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                         }
                         else if (this.t > timeScene4 && this.t <= timeScene5) {
                             console.log(4);
-                            //person sits on butterfly and butterfly moves?
+                            //person sits on butterfly
                             this.time_offset = timeScene4;
                             this.scene4(graphics_state, body_transform);
                         }
@@ -860,11 +903,17 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                             this.time_offset = timeScene8;
                             this.scene8(graphics_state, body_transform);
                         }
-                        else if (this.t > timeScene9) {
+                        else if (this.t > timeScene9 && this.t <= timeScene10) {
                             console.log(9);
                             //spaceship moves down
                             this.time_offset = timeScene9;
                             this.scene9(graphics_state, body_transform);
+                        }
+                        else if (this.t > timeScene10) {
+                            console.log(10);
+                            //spaceship moves down
+                            this.time_offset = timeScene9;
+                            this.scene10(graphics_state, body_transform);
                         }
 
 
