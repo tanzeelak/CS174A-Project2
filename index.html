@@ -115,7 +115,9 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
 
                 this.time_offset = 0;
 
-                this.head_size = 2;
+                this.head_width = 1.5;
+                this.head_height = 1.5;
+                this.head_length = 1;
 
                 this.body_height = 3;
                 this.body_length = 2;
@@ -183,7 +185,6 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 Object.assign( this, { purplePlastic: context.get_instance( Phong_Model  ).material( Color.of( .9,.5,.9, 1 ), .4, .4, .8, 40 ),
                     greyPlastic  : context.get_instance( Phong_Model  ).material( Color.of( .5,.5,.5, 1 ), .4, .8, .4, 20 ),   // Smaller exponent means
                     blueGlass    : context.get_instance( Phong_Model  ).material( Color.of( .5,.5, 1,.2 ), .4, .8, .4, 40 ),   // a bigger shiny spot.
-                    greenGrass    : context.get_instance( Phong_Model  ).material( Color.of( .5,1,.5,.2 ), .4, .8, .4, 40 ),   // a bigger shiny spot.
                     yellow: context.get_instance( Phong_Model ).material( Color.of( .8, .8, .3,  1 ), .2, 1, .7, 40 ),  // Call material() on the Phong_Shader,
                     brown:  context.get_instance( Phong_Model ).material( Color.of( .3, .3, .1,  1 ), .2, 1,  1, 40 ),  // which returns a special-made "material"
                     red:    context.get_instance( Phong_Model ).material( Color.of(  1,  0,  0, .9 ), .1, .7, 1, 40 ),  // (a JavaScript object)
@@ -192,8 +193,9 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     silver: context.get_instance( Phong_Model ).material( Color.of( .8, .8, .8,  1 ),  0,  1, 1, 40 ),
                     fire         : context.get_instance( Funny_Shader ).material(),
                     stars        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,1,1 ), .5, .5, .5, 40, context.get_instance( "assets/stars.png" ) ),
-                    rgb        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,1,1 ), .5, .5, .5, 40, context.get_instance( "assets/rgb.jpg" ) ) } );
-
+                    rgb        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,1,1 ), .5, .5, .5, 40, context.get_instance( "assets/rgb.jpg" ) ),
+                    greenGrass        : context.get_instance( Phong_Model  ).material( Color.of( 0,0,0,1 ), .5, .5, .5, 40, context.get_instance( "assets/grass.jpg" ) )
+                } );
                     numToColor[0] = this.yellow;
                     numToColor[1] = this.brown;
                     numToColor[2] = this.red;
@@ -357,8 +359,8 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                 ////////////////////////////////////////////////////////////////////////////
 
                 draw_head (graphics_state, head_transform, scene) {
-                    head_transform = head_transform.times( Mat4.translation([ 0, 5, 0 ]) );
-                    this.shapes.ball.draw(graphics_state, head_transform.times(Mat4.scale(Vec.of(this.head_size,this.head_size,this.head_size))), this.greyPlastic);
+                    head_transform = head_transform.times( Mat4.translation([ 0, this.body_height+this.head_height, 0 ]) );
+                    this.shapes.box.draw(graphics_state, head_transform.times(Mat4.scale(Vec.of(this.head_width,this.head_height,this.head_length))), this.greyPlastic);
                 }
                 draw_arms (graphics_state, arm_transform, scene) {
                     let hinge_width = this.arm_width;
