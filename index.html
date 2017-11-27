@@ -189,7 +189,8 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     yellow: context.get_instance( Phong_Model ).material( Color.of( .8, .8, .3,  1 ), .2, 1, .7, 40 ),  // Call material() on the Phong_Shader,
                     brown:  context.get_instance( Phong_Model ).material( Color.of( .3, .3, .1,  1 ), .2, 1,  1, 40 ),  // which returns a special-made "material"
                     red:    context.get_instance( Phong_Model ).material( Color.of(  1,  0,  0, .9 ), .1, .7, 1, 40 ),  // (a JavaScript object)
-                    green:  context.get_instance( Phong_Model ).material( Color.of(  0, .5,  0,  1 ), .1, .7, 1, 40 ),
+                    maroon:    context.get_instance( Phong_Model ).material( Color.of(  128,  0,  0, .9 ), .1, .7, 1, 40 ),  // (a JavaScript object)
+                    green:  context.get_instance( Phong_Model ).material( Color.of(  0, .5,  0,  .8 ), .1, .7, 1, 40 ),
                     wheelsGreen:  context.get_instance( Phong_Model ).material( Color.of(  126, 178,  44,  1 ), .1, .7, 1, 40 ),
                     blue:   context.get_instance( Phong_Model ).material( Color.of(  0,  0,  1, .8 ), .1, .7, 1, 40 ),
                     pantsBlue:   context.get_instance( Phong_Model ).material( Color.of(  0,  .2,  1, 1 ), .1, .7, 1, 40 ),
@@ -449,7 +450,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                         }
                         upper_leg_transform = upper_leg_transform.times(Mat4.translation(Vec.of(-hinge_width, -hinge_height, -hinge_length)));
                         //scale
-                        this.shapes.box.draw(graphics_state, upper_leg_transform.times(Mat4.scale(Vec.of(this.leg_width,this.leg_height,this.leg_length))), this.fire);
+                        this.shapes.box.draw(graphics_state, upper_leg_transform.times(Mat4.scale(Vec.of(this.leg_width,this.leg_height,this.leg_length))), this.pantsBlue);
 
                         let bottom_leg_transform = upper_leg_transform;
                         //correct position
@@ -464,7 +465,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                         }
                         bottom_leg_transform = bottom_leg_transform.times(Mat4.translation(Vec.of(-hinge_width, -(hinge_height), hinge_length)));
                         //scale
-                        this.shapes.box.draw(graphics_state, bottom_leg_transform.times(Mat4.scale(Vec.of(this.leg_width,this.leg_height,this.leg_length))), this.fire);
+                        this.shapes.box.draw(graphics_state, bottom_leg_transform.times(Mat4.scale(Vec.of(this.leg_width,this.leg_height,this.leg_length))), this.pantsBlue);
 
                         let foot_transform = bottom_leg_transform;
                         foot_transform = foot_transform.times(Mat4.translation(Vec.of(0,-this.leg_height-1, 0)));
@@ -477,7 +478,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                         else {
                             shoe_transform = shoe_transform.times(Mat4.translation(Vec.of(this.body_width*2*i, -this.body_height - 4.5*this.leg_height, 2*this.body_length)));
                         }
-                        this.shapes.box.draw(graphics_state, shoe_transform.times(Mat4.scale(Vec.of(this.shoe_width,this.shoe_height,this.shoe_length))), this.stars);
+                        this.shapes.box.draw(graphics_state, shoe_transform.times(Mat4.scale(Vec.of(this.shoe_width,this.shoe_height,this.shoe_length))), this.brown);
                         upper_leg_transform = orig;
                     }
                 }
@@ -565,7 +566,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     spaceship_transform = spaceship_transform.times(Mat4.translation([0, 0, -ball_height]));
                     this.shapes.donut.draw(graphics_state, spaceship_transform.times(Mat4.scale(Vec.of(donut_width, donut_width, donut_width))), this.silver);
                     spaceship_transform = spaceship_transform.times(Mat4.translation([0, 0, -cone_height]));
-                    this.shapes.open_cone.draw(graphics_state, spaceship_transform.times(Mat4.scale(Vec.of(cone_width, cone_width, cone_height))), this.greenGrass);
+                    this.shapes.open_cone.draw(graphics_state, spaceship_transform.times(Mat4.scale(Vec.of(cone_width, cone_width, cone_height))), this.green);
                 }
                 scene1(graphics_state, body_transform) {
                     //camera, looking at, up
@@ -574,7 +575,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     this.draw_cliff(graphics_state, this.cliff_transform, 1);
 
                     body_transform = body_transform.times(Mat4.translation([4*this.t, 0, 0]));
-                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
+                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.maroon );
                     this.draw_head(graphics_state, body_transform, 1);
                     this.draw_arms(graphics_state, body_transform, 1);
                     this.draw_legs(graphics_state, body_transform, 1);
@@ -617,7 +618,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                         body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, 1, 1)));
                     }
 
-                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
+                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.maroon );
                     this.draw_head(graphics_state, body_transform, 2);
                     this.draw_arms(graphics_state, body_transform, 2);
                     this.draw_legs(graphics_state, body_transform, 2);
@@ -666,7 +667,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     body_transform = body_transform.times(Mat4.translation([offsetX, offsetY, offsetZ]));
                     body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, 1, 1)));
 
-                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
+                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.maroon );
                     this.draw_head(graphics_state, body_transform, 3);
                     this.draw_arms(graphics_state, body_transform, 3);
                     this.draw_legs(graphics_state, body_transform, 3);
@@ -710,7 +711,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     body_transform = body_transform.times(Mat4.rotation(Math.PI/8, Vec.of(0, -1, -1)));
                     body_transform = body_transform.times(Mat4.rotation(Math.PI/2, Vec.of(0, 1, 0)));
 
-                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
+                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.maroon );
                     this.draw_head(graphics_state, body_transform, 4);
                     this.draw_arms(graphics_state, body_transform, 4);
                     this.draw_legs(graphics_state, body_transform, 4);
@@ -753,7 +754,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     this.draw_cliff(graphics_state, this.cliff_transform, 5);
 
                     body_transform = body_transform.times(Mat4.translation([0, 3*Math.sin(3*this.t), 10*this.t]));
-                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
+                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.maroon );
                     this.draw_head(graphics_state, body_transform, 5);
                     this.draw_arms(graphics_state, body_transform, 5);
                     this.draw_legs(graphics_state, body_transform, 5);
@@ -795,7 +796,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     //graphics_state.camera_transform = Mat4.look_at( Vec.of(90+bodyX,bodyY,200+bodyZ+offsetZ), Vec.of( 2*bodyX,bodyY,bodyZ), Vec.of( 0,1,0 ) );
 
                     body_transform = body_transform.times(Mat4.translation([0, 3*Math.sin(3*this.t), 10*this.t]));
-                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
+                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.maroon );
                     this.draw_head(graphics_state, body_transform, 6);
                     this.draw_arms(graphics_state, body_transform, 6);
                     this.draw_legs(graphics_state, body_transform, 6);
@@ -831,7 +832,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var bodyZ = this.bodyZ_curr;
                     // graphics_state.camera_transform = Mat4.look_at( Vec.of(90+bodyX,bodyY,200+bodyZ), Vec.of( 2*bodyX,bodyY,bodyZ), Vec.of( 0,1,0 ) );
 
-                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
+                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.maroon );
                     this.draw_head(graphics_state, body_transform, 7);
                     this.draw_arms(graphics_state, body_transform, 7);
                     this.draw_legs(graphics_state, body_transform, 7);
@@ -855,7 +856,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var genie_transform = this.genie_transform_next;
                     var spaceship_transform = this.spaceship_transform_next;
 
-                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
+                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.maroon );
                     this.draw_head(graphics_state, body_transform, 8);
                     this.draw_arms(graphics_state, body_transform, 8);
                     this.draw_legs(graphics_state, body_transform, 8);
@@ -884,7 +885,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var genie_transform = this.genie_transform_curr;
                     var spaceship_transform = this.spaceship_transform_curr;
 
-                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
+                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.maroon );
                     this.draw_head(graphics_state, body_transform, 9);
                     this.draw_arms(graphics_state, body_transform, 9);
                     this.draw_legs(graphics_state, body_transform, 9);
@@ -912,9 +913,13 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var spaceship_transform = this.spaceship_transform_next;
 
                     body_transform = body_transform.times(Mat4.rotation(Math.PI/2, Vec.of(0, -1, 0)));
+                    //slower
                     body_transform = body_transform.times(Mat4.translation([0, this.t, 0]));
-                    body_transform = body_transform.times(Mat4.scale(Vec.of(this.t/10, this.t/10, this.t/10)));
-                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.stars );
+                    body_transform = body_transform.times(Mat4.scale(Vec.of(.75, .75, .75)));
+                    //faster
+                    // body_transform = body_transform.times(Mat4.translation([0, 10*this.t, 0]));
+                    // body_transform = body_transform.times(Mat4.scale(Vec.of(.5, .5, .5)));
+                    this.shapes.box.draw( graphics_state, body_transform.times(Mat4.scale(Vec.of(this.body_length,this.body_height,this.body_width))), this.maroon );
                     this.draw_head(graphics_state, body_transform, 10);
                     this.draw_arms(graphics_state, body_transform, 10);
                     this.draw_legs(graphics_state, body_transform, 10);
