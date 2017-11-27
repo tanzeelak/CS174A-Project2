@@ -717,7 +717,7 @@ class Tutorial_Animation extends Scene_Component  // An example of a Scene_Compo
                     var bodyX = this.bodyX_curr;
                     var bodyY = this.bodyY_curr+offsetY;
                     var bodyZ = this.bodyZ_curr-offsetZ;
-                    graphics_state.camera_transform = Mat4.look_at( Vec.of( 80,0, 80), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
+                    graphics_state.camera_transform = Mat4.look_at( Vec.of(90,0+bodyY, 200+bodyZ+offsetZ), Vec.of( bodyX,bodyY,bodyZ ), Vec.of( 0,1,0 ) );
 
                     this.draw_cliff(graphics_state, this.cliff_transform, 5);
 
